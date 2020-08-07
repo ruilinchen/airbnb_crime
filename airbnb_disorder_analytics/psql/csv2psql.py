@@ -1,4 +1,5 @@
 from airbnb_disorder_analytics.config.db_config import DBInfo
+from airbnb_disorder_analytics.config.csv2psql_config import ColumnInfo
 import psycopg2
 import pandas as pd
 import os
@@ -29,68 +30,56 @@ def get_filenames_by_region(region):
     }
 
 
-# raw data files
-region_list = ['austin-round-rock-tx',
-               'boston-cambridge-newton-ma-nh']
-
-target_region = 'austin-round-rock-tx'
-
-target_filename_dict = get_filenames_by_region(target_region)
-
-# todo update property table
-property_filename = target_filename_dict['property']
-property_df = pd.read_csv(os.path.join('../data', property_filename))
-
-
-def insert_into_property(property_df):
+def insert_into_database(df, column_dict, verbose=True):
     '''
     database function -- populate the property table in airbnb_data
 
     :param property_df: a pandas dataframe
-    :return: ???
+    :return: True
     '''
-
-    db_columns = ['property_id', 'property_title', 'property_type',
-                    'listing_type', 'created_on', 'last_scraped_on',
-                    'country', 'latitude', 'longitude', 'state',
-                    'city', 'zipcode', 'neighborhood', 'msa',
-                    'average_daily_rate', 'annual_revenue',
-                    'occupancy_rate', 'number_of_bookings',
-                    'count_reservation_days', 'count_available_days',
-                    'count_blocked_days', 'calendar_last_updated',
-                    'response_rate', 'airbnb_superhost',
-                    'security_deposit', 'cleaning_fee', 'published_nightly_fee',
-                    'published_monthly_rate', 'published_weekly_rate', 'number_of_reviews',
-                    'overall_rating', 'airbnb_host_id', 'airbnb_listing_url'
-                  ]  # a list of all the column headings to be included in the insertion entry
-    df_columns = ['Property ID', 'Listing Title', 'Property Type',
-                  'Listing Type', 'Created Date', 'Last Scraped Date',
-                  'Country', 'Latitude', 'Longitude',
-                  'State','City','Zipcode', 'Neighborhood',
-                  'Metropolitan Statistical Area', 'Average Daily Rate (USD)',
-                  'Annual Revenue LTM (USD)', 'Occupancy Rate LTM',
-                  'Number of Bookings LTM', 'Count Reservation Days LTM',
-                  'Count Available Days LTM', 'Count Blocked Days LTM',
-                  'Calendar Last Updated', 'Response Rate', 'Airbnb Superhost',
-                  'Security Deposit (USD)', 'Cleaning Fee (USD)',
-                  'Published Nightly Rate (USD)', 'Published Monthly Rate (USD)',
-                  'Published Weekly Rate (USD)', 'Number of Reviews', 'Overall Rating',
-                  'Airbnb Host ID', 'Airbnb Listing URL'
-                  ] # a list of pandas column names arranged in the same sequence as the database columns list
-    for row in tqdm(property_df.loc[:, df_columns].itertuples()):
-        print(row)
-        break
-        query = ''' INSERT INTO %s('%s') VALUES(%%s); ''' % (table_name, ', '.join(db_columns))
-        cursor.execute(query, row)
-    return False
+    step = 0
+    for row in tqdm(df.loc[:, column_dict['df']].itertuples(index=False), total=len(df)):
+        records_list_template = ','.join(['%s'] * len(row))
+        insert_query = """INSERT INTO {table} ({columns})
+                            VALUES ({values}) 
+                            ON CONFLICT ({keys}) DO NOTHING
+                            RETURNING {output} ;""".format(table=column_dict['table'],
+                                                              columns=','.join(column_dict['db']),
+                                                              values=records_list_template,
+                                                              keys=','.join(column_dict['primary_keys']),
+                                                              output=column_dict['primary_keys'][0])
+        cursor.execute(insert_query, tuple(row))
+        if verbose:
+            print(cursor.fetchone())
+    connection.commit()
+    return True
 
 
-insert_into_property(property_df)
+def set_null_values_in_daily_booking(null_value='1990-01-01'):
+    """
+    database function: use NULL as opposed to '1990-01-01' to represent null values in daily booking
 
+    during insertion, null values in pandas were replaced with '1990-01-01' because psycopg2's insert module
+    does not accept empty strings in TimeStamp columns.
+    this function resets these values to null and is to be used after running the insertion function.
 
-## todo update daily_booking table
+    :param null_value: the value previously used to replace empty strings in daily_booking.csv
+    :return: True
+    """
+    query = """UPDATE daily_booking
+                SET booked_date = NULL
+                WHERE booked_date = '{}';""".format(null_value)
+    cursor.execute(query)
+    connection.commit()
+    return True
 
-## todo update monthly_match table
+region_list = ['austin-round-rock-tx', 'boston-cambridge-newton-ma-nh',
+               'chicago-naperville-elgin-il-in-wi', ]
+target_region = 'boston-cambridge-newton-ma-nh'
+target_filename_dict = get_filenames_by_region(target_region)
 
+monthly_match_filename = target_filename_dict['monthly_match']
+monthly_match_df = pd.read_csv(os.path.join('../../data', monthly_match_filename))
+print('finished reading monthly match')
+insert_into_database(monthly_match_df, ColumnInfo.monthly_match, verbose=False)
 
-## todo update reviewer and review table
