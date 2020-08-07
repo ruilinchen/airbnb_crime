@@ -18,6 +18,6 @@ __all__ = ['DBInfo']
 class DBInfo:
     try:
         importlib.reload(keys)
-        psycopg2_config = "dbname={} user='postgres' host='localhost' password={}".format('up_data', base64.b64decode(keys.psql_password).decode("utf-8"))
+        psycopg2_config = "dbname={} user='postgres' host='localhost' password={}".format('airbnb_data', base64.b64decode(keys.psql_password).decode("utf-8"))
     except UnicodeDecodeError:
-        psycopg2_config = "dbname={} user='postgres' host='localhost' password={}".format('up_data', keys.psql_password)
+        psycopg2_config = "dbname={} user='postgres' host='localhost' password={}".format('airbnb_data', keys.psql_password)
