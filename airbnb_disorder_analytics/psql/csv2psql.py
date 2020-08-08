@@ -37,21 +37,27 @@ def insert_into_database(df, column_dict, verbose=True):
     :param property_df: a pandas dataframe
     :return: True
     '''
-    step = 0
     for row in tqdm(df.loc[:, column_dict['df']].itertuples(index=False), total=len(df)):
         records_list_template = ','.join(['%s'] * len(row))
         insert_query = """INSERT INTO {table} ({columns})
                             VALUES ({values}) 
                             ON CONFLICT ({keys}) DO NOTHING
                             RETURNING {output} ;""".format(table=column_dict['table'],
-                                                              columns=','.join(column_dict['db']),
-                                                              values=records_list_template,
-                                                              keys=','.join(column_dict['primary_keys']),
-                                                              output=column_dict['primary_keys'][0])
-        cursor.execute(insert_query, tuple(row))
-        if verbose:
-            print(cursor.fetchone())
-    connection.commit()
+                                                           columns=','.join(column_dict['db']),
+                                                           values=records_list_template,
+                                                           keys=','.join(column_dict['primary_keys']),
+                                                           output=column_dict['primary_keys'][0])
+        try:
+            cursor.execute(insert_query, tuple(row))
+            if verbose:
+                print(cursor.fetchone())
+                connection.commit()
+        except (Exception, psycopg2.Error) as error:
+            print('\nerror:', error)
+            print(tuple(row))
+            if connection:
+                connection.rollback()  # rollback to previous commit so that this insertion entry is abandoned and
+                # does not influence later updates
     return True
 
 
@@ -69,17 +75,33 @@ def set_null_values_in_daily_booking(null_value='1990-01-01'):
     query = """UPDATE daily_booking
                 SET booked_date = NULL
                 WHERE booked_date = '{}';""".format(null_value)
+
     cursor.execute(query)
     connection.commit()
     return True
 
-region_list = ['austin-round-rock-tx', 'boston-cambridge-newton-ma-nh',
-               'chicago-naperville-elgin-il-in-wi', ]
-target_region = 'boston-cambridge-newton-ma-nh'
-target_filename_dict = get_filenames_by_region(target_region)
 
-monthly_match_filename = target_filename_dict['monthly_match']
-monthly_match_df = pd.read_csv(os.path.join('../../data', monthly_match_filename))
-print('finished reading monthly match')
-insert_into_database(monthly_match_df, ColumnInfo.monthly_match, verbose=False)
-
+region_list = ['austin-round-rock-tx',
+               'boston-cambridge-newton-ma-nh',
+               'chicago-naperville-elgin-il-in-wi',
+               'los-angeles-long-beach-anaheim-ca',
+               'miami-fort-lauderdale-west-palm-beach-fl',
+               'new-york-newark-jersey-city-ny-nj-pa',
+               'san-diego-carlsbad-ca',
+               'san-francisco-oakland-hayward-ca',
+               'seattle-tacoma-bellevue-wa',
+               'washington-arlington-alexandria-dc-va-md-wv'
+               ]
+for target_region in region_list:
+    target_filename_dict = get_filenames_by_region(target_region)
+    print(target_region)
+    filename = target_filename_dict['property']
+    #filename = target_filename_dict['review']
+    df = pd.read_csv(os.path.join('../../data', filename))
+    df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')
+    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01')
+    df['Created Date'] = df['Created Date'].fillna('1990-01-01')
+    #df['Member Since'] = df['Member Since'].fillna('1990-01-01')
+    print('finished reading file')
+    insert_into_database(df, ColumnInfo.property, verbose=False)
+    #insert_into_database(df, ColumnInfo.reviewer, verbose=False)
