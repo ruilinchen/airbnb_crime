@@ -1,3 +1,23 @@
+'''
+csv2psql.py
+
+this script migrates the raw data from csv to Postgresql
+before running it, users are expected to create a database with a set of collections
+    - property
+    - monthly match
+    - review
+    - reviewer
+and set up connections to the database by modifying config.db_config.DBInfo.
+
+for now, the program doesn't allow insertion of the daily_booking data.
+to allow this, users need to include necessary information in config.csv2psql_config.ColumnInfo
+
+Dependencies:
+    - third-party packages: psycopg2
+    - local packages: config.db_config and config.csv2psql_config
+'''
+import airbnb_disorder_analytics
+from airbnb_disorder_analytics import config
 from airbnb_disorder_analytics.config.db_config import DBInfo
 from airbnb_disorder_analytics.config.csv2psql_config import ColumnInfo
 import psycopg2
@@ -30,14 +50,16 @@ def get_filenames_by_region(region):
     }
 
 
-def insert_into_database(df, column_dict, verbose=True):
+def insert_into_database(a_df, column_dict, verbose=True):
     '''
     database function -- populate the property table in airbnb_data
 
-    :param property_df: a pandas dataframe
+    :param a_df: a pandas dataframe
+    :param column_dict: a dictionary with info on matching pandas with psql tables
+    :param verbose: boolean -> whether to print outputs for this function
     :return: True
     '''
-    for row in tqdm(df.loc[:, column_dict['df']].itertuples(index=False), total=len(df)):
+    for row in tqdm(a_df.loc[:, column_dict['df']].itertuples(index=False), total=len(a_df)):
         records_list_template = ','.join(['%s'] * len(row))
         insert_query = """INSERT INTO {table} ({columns})
                             VALUES ({values}) 
@@ -78,6 +100,24 @@ def set_null_values_in_daily_booking(null_value='1990-01-01'):
 
     cursor.execute(query)
     connection.commit()
+
+    query = """UPDATE property
+                SET created_on = NULL
+                WHERE created_on = '{}';""".format(null_value)
+    cursor.execute(query)
+    connection.commit()
+
+    query = """UPDATE property
+                SET last_scraped_on = NULL
+                WHERE last_scraped_on = '{}';""".format(null_value)
+    cursor.execute(query)
+    connection.commit()
+
+    query = """UPDATE reviewer
+                SET member_since = NULL
+                WHERE member_since = '{}';""".format(null_value)
+    cursor.execute(query)
+    connection.commit()
     return True
 
 
@@ -95,13 +135,16 @@ region_list = ['austin-round-rock-tx',
 for target_region in region_list:
     target_filename_dict = get_filenames_by_region(target_region)
     print(target_region)
+    # filename = target_filename_dict['monthly_match']
     filename = target_filename_dict['property']
-    #filename = target_filename_dict['review']
-    df = pd.read_csv(os.path.join('../../data', filename))
-    df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')
-    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01')
-    df['Created Date'] = df['Created Date'].fillna('1990-01-01')
-    #df['Member Since'] = df['Member Since'].fillna('1990-01-01')
+    df = pd.read_csv(os.path.join('../../data', filename), error_bad_lines=False)
+    df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')  # for property
+    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01') # for property
+    df['Created Date'] = df['Created Date'].fillna('1990-01-01') # for property
+    # df['Member Since'] = df['Member Since'].fillna('1990-01-01') # for review
     print('finished reading file')
     insert_into_database(df, ColumnInfo.property, verbose=False)
-    #insert_into_database(df, ColumnInfo.reviewer, verbose=False)
+
+
+# replace 1990-01-01 with null in the database
+# columns to look: last_scraped_on, created_on in property and member_since in review
