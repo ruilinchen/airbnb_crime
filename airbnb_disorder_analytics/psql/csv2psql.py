@@ -15,9 +15,10 @@ to allow this, users need to include necessary information in config.csv2psql_co
 Dependencies:
     - third-party packages: psycopg2
     - local packages: config.db_config and config.csv2psql_config
+
+ruilin chen
+08/09/2020
 '''
-import airbnb_disorder_analytics
-from airbnb_disorder_analytics import config
 from airbnb_disorder_analytics.config.db_config import DBInfo
 from airbnb_disorder_analytics.config.csv2psql_config import ColumnInfo
 import psycopg2

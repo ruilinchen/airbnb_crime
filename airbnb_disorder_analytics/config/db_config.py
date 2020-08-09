@@ -7,6 +7,9 @@ this is mainly used along with psycopg2 where connections to PSQL can be set up 
     >> cursor = connection.cursor()
 Dependencies:
     - local package: config
+
+ruilin chen
+08/09/2020
 '''
 
 from . import keys

@@ -11,13 +11,23 @@ matching is based on the longitude and latitude of the listing.
 Dependencies:
     - third-party packages: psycopg2, censusgeocode
     - local packages: config.db_config
+
+ruilin chen
+08/09/2020
 '''
 
-from airbnb_disorder_analytics.config.db_config import DBInfo
-import psycopg2
-import censusgeocode as cg
+# system import
+import time
+import random
 from pprint import pprint
 from tqdm import tqdm
+import multiprocessing
+# third-party import
+import psycopg2
+import censusgeocode as cg
+# local import
+from airbnb_disorder_analytics.config.db_config import DBInfo
+
 
 # connect to database
 connection = psycopg2.connect(DBInfo.psycopg2_config)
@@ -57,7 +67,12 @@ def get_census_tract_by_geo_info(longitude, latitude, verbose=True):
                             - county_id
                             - state_id
     """
-    geocoded_result = cg.coordinates(x=longitude, y=latitude)
+    geocoded_result = None
+    while geocoded_result is None: # repeatly calling the Census API until the program gets the right return
+        try:
+            geocoded_result = cg.coordinates(x=longitude, y=latitude)
+        except ValueError:
+            time.sleep(random.random())
     assert len(geocoded_result)
     census_block_id = geocoded_result['2010 Census Blocks'][0]['GEOID']
     census_tract_id = geocoded_result['Census Tracts'][0]['GEOID']
@@ -156,7 +171,7 @@ def geolocate_properties_by_batch(batch_size=10, verbose=True):
         state_id = matched_result['state_id']
         update_census_block_to_psql(property_id, census_block_id, census_tract_id, verbose)
         update_census_tract_to_psql(census_tract_id, county_id, state_id, verbose)
-    connection.commit()
+        connection.commit()
 
 
 def geolocate_all_properties(verbose=True):
@@ -177,7 +192,7 @@ def geolocate_all_properties(verbose=True):
     count_of_unlocated_properties = result[0]
     while count_of_unlocated_properties:
         print('remaining unlocated properties:', count_of_unlocated_properties)
-        batch_size = min(count_of_unlocated_properties, 100)
+        batch_size = min(count_of_unlocated_properties, 50)
         geolocate_properties_by_batch(batch_size, verbose)
         count_of_unlocated_properties -= batch_size
 

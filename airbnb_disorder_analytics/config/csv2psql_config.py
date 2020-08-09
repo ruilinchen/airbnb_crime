@@ -1,6 +1,9 @@
 '''
 csv2psql_config.py
 with information to match csv columns (of raw data) to database columns by table
+
+ruilin chen
+08/09/2020
 '''
 
 __all__ = ['ColumnInfo']
