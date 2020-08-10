@@ -30,7 +30,7 @@ from airbnb_disorder_analytics.config.db_config import DBInfo
 
 
 # connect to database
-connection = psycopg2.connect(DBInfo.psycopg2_config)
+connection = psycopg2.connect(DBInfo.airbnb_config)
 cursor = connection.cursor()
 
 

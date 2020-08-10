@@ -27,7 +27,7 @@ import os
 from tqdm import tqdm
 
 # connect to database
-connection = psycopg2.connect(DBInfo.psycopg2_config)
+connection = psycopg2.connect(DBInfo.airbnb_config)
 cursor = connection.cursor()
 
 

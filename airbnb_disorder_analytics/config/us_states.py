@@ -6,17 +6,11 @@ ruilin chen
 08/09/2020
 '''
 
-from . import keys
-import base64
-import importlib
-
 __all__ = ['USStates']
 
 
 class USStates:
-    def __int__(self):
-        self.abbr = None
-        self.full_name = None
+    def __init__(self):
         self.abbr_to_name = {
             "AL": "Alabama",
             "AK": "Alaska",
@@ -71,6 +65,25 @@ class USStates:
             "WY": "Wyoming"
         }
 
+    def all_states(self, abbr=True, sep=' '):
+        """
+        return a list of US states either in abbreviation or in full names  in the specified format
+            users can specify the word separator used in the representation of the name:
+                for states whose name contains more than one word such as New York,
+                users can specify these words to be connected either by a blank space (the default setting),
+                or other separators, such as dash(New-York), plus(New+York) or no space at all (NewYork)
+
+        :param abbr: Boolean
+        :param sep: str
+        :return: a list of str
+        """
+        if abbr:
+            return list(self.abbr_to_name.keys())
+        elif sep == ' ':
+            return list(self.abbr_to_name.values())
+        else:
+            return [name.replace(' ', sep) for name in self.abbr_to_name.values()]
+
     def abbr2name(self, state_abbr, sep=' '):
         """
         get state name from abbreviation
@@ -82,11 +95,16 @@ class USStates:
         :param sep: str
         :return: state_name: str
         """
-        self.abbr = state_abbr.strip()
-        assert len(self.abbr) == 2 and self.abbr in self.abbr_to_name
+        state_abbr = state_abbr.strip()
+        assert len(state_abbr) == 2 and state_abbr in self.abbr_to_name
         if sep == ' ':
-            return self.abbr_to_name[self.abbr]
+            return self.abbr_to_name[state_abbr]
         else:
-            state_name = self.abbr_to_name[self.abbr]
-            state_name.replace(' ', sep)
+            state_name = self.abbr_to_name[state_abbr]
+            state_name = state_name.replace(' ', sep)
             return state_name
+
+
+if __name__ == '__main__':
+    uss = USStates()
+    print(uss.abbr2name('DC', sep=''))
