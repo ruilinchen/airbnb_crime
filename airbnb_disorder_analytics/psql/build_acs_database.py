@@ -69,7 +69,8 @@ class FileStructure:
         :return: None
         """
         self.uss = USStates()
-        self.data_folder = 'acs5_data'  # where all the acs5-related data is stored
+        self.root_path = '/home/rchen/Documents/github/airbnb_crime/airbnb_disorder_analytics/psql'
+        self.data_folder = os.path.join(self.root_path, 'acs5_data')  # where all the acs5-related data is stored
         if not os.path.isdir(self.data_folder):
             os.mkdir(self.data_folder)
         self.year = int(year)
@@ -83,7 +84,7 @@ class FileStructure:
         self.census_block_foldername = 'census_blocks'
         self.gfilename = f'g{self.year}5{self.state_abbr.lower()}.csv'  # the geo-info file inside the summary folder
         # where the ids of our interested ACS5 variables are stored
-        self.key_acs5_variables_filepath = '../analytics/key_acs5_variables.csv'
+        self.key_acs5_variables_filepath = '../../analytics/key_acs5_variables.csv'
         # has detailed information on different ACS tables
         self.table_desc_filename = f'ACS5_{self.year}_table_descriptions.csv'
         # psql connection
@@ -370,12 +371,12 @@ class VariablesInSummaryFile(ACSTableStructure):
     is also the index of the column where the estimate and margin-of-error of this variable is stored
     in the E-file and the M-file.
     """
-    def __init__(self, year, state_abbreviation):
+    def __init__(self, year, state_abbreviation, verbose=False):
         super().__init__(year, state_abbreviation)
         self.variables_in_summary = {}
-        self._build_variables2summary_directory()
+        self._build_variables2summary_directory(verbose)
 
-    def _build_variables2summary_directory(self, verbose=True):
+    def _build_variables2summary_directory(self, verbose=False):
         for filename in os.listdir(os.path.join(self.data_folder, self.templates_foldername)):
             if 'seq' in filename.lower():
                 # Generate 4-digit sequence number string
@@ -429,7 +430,7 @@ class ACSInsertion(ACSTableStructure):
     """
     insert ACS data by variable_id
     """
-    def __init__(self, year, state_abbreviation):
+    def __init__(self, year, state_abbreviation, verbose=True):
         super().__init__(year, state_abbreviation)
         self.variables_in_summary = {}
         self.efile_by_id = {}
@@ -437,15 +438,15 @@ class ACSInsertion(ACSTableStructure):
         self.summary_level_for_census_block = '150'
         self.summary_level_for_census_tract = '140'
 
-        vsf = VariablesInSummaryFile(year, state_abbreviation)  # build the summary_to_variable_list directory
+        vsf = VariablesInSummaryFile(year, state_abbreviation, verbose)  # build the summary_to_variable_list directory
         self.variables_in_summary = vsf.variables_in_summary
 
         sf = SummaryFilesByID(year, state_abbreviation)  # build the summary_id_to_filename directory
         self.efile_by_id = sf.efile_by_id
         self.mfile_by_id = sf.mfile_by_id
 
-    def set_new_state(self, state_abbreviation):
-        self.__init__(self.year, state_abbreviation)
+    def set_new_state(self, state_abbreviation, verbose=False):
+        self.__init__(self.year, state_abbreviation, verbose)
 
     @staticmethod
     def read_summary_file(file, column_names):
@@ -559,15 +560,16 @@ class ACSInsertion(ACSTableStructure):
         if census_block:
             gdf = gdf[['Logical Record Number', 'Geographic Identifier']][gdf['Summary Level']
                                                                           == self.summary_level_for_census_block]
+            gdf.columns = ['logical_record_number', 'geographic_identifier']
             gdf['census_tract_id'] = gdf['geographic_identifier'].str.split('US').str[1].str[:-1]
             gdf['census_block_group'] = gdf['geographic_identifier'].str.split('US').str[1].str[-1]
 
         if census_tract:
             gdf = gdf[['Logical Record Number', 'Geographic Identifier']][gdf['Summary Level'] ==
                                                                           self.summary_level_for_census_tract]
-            gdf['census_tract_id'] = gdf['geographic_identifier'].str.split('US').str[1].str[:-1]
+            gdf.columns = ['logical_record_number', 'geographic_identifier']
+            gdf['census_tract_id'] = gdf['geographic_identifier'].str.split('US').str[1]
 
-        gdf.columns = ['logical_record_number', 'geographic_identifier']
         # add two more columns on census_tract_id and census_block_group
 
         # read estimates and margins-of-error
@@ -625,26 +627,25 @@ class ACSInsertion(ACSTableStructure):
 
         :return: a list of variable_ids
         """
-        variable_df = pd.read_csv(self.key_acs5_variables_filepath)
+        variable_df = pd.read_csv(os.path.join(self.data_folder, self.key_acs5_variables_filepath))
         return list(variable_df['variable_id'])
 
-
 if __name__ == '__main__':
+    """
     d = Downloader(2018, 'NY')   # test the functioning of the Downloader class
     d.download_raw_data_by_state()
     a = ACSTableStructure(2018, 'NY')  # test the functioning of the ACSTableStructure class
     a.insert_table_structure_into_psql(verbose=False)
     cbt = CensusBlock2Tract(2018, 'NY')
     cbt.insert_census_blocks_into_psql(verbose=False)  # test the functioning of the CensusBlock2Tract class
+    """
     acs = ACSInsertion(2018, 'NY')   # test the functioning of the ACSInsertion class
     list_of_us_states = acs.uss.all_states()  # get a list of all US states in their abbreviations
     df = acs.get_key_acs5_variables()  # get a list of ACS5 variables to insert
     key_variable_ids = acs.get_key_acs5_variables()
     for key_variable_id in tqdm(key_variable_ids,  total=len(key_variable_ids)):
         print('== a new round: inserting data related to', key_variable_id)
-        target_table_id = acs.get_table_id_from_variable_id(key_variable_id)
         print('variable property:', acs.get_variable_restriction_from_variable_id(key_variable_id))
-        for state_abbr in list_of_us_states:
+        for state_abbr in tqdm(list_of_us_states, total=len(list_of_us_states)):
             acs.set_new_state(state_abbr)
-            acs.insert_variable_into_psql(target_table_id, key_variable_id, census_tract=True, verbose=False)
-            break
+            acs.insert_variable_into_psql(key_variable_id, census_tract=True, verbose=False)
