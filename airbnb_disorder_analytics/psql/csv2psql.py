@@ -140,9 +140,9 @@ for target_region in region_list:
     filename = target_filename_dict['property']
     df = pd.read_csv(os.path.join('../../data', filename), error_bad_lines=False)
     df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')  # for property
-    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01') # for property
-    df['Created Date'] = df['Created Date'].fillna('1990-01-01') # for property
-    # df['Member Since'] = df['Member Since'].fillna('1990-01-01') # for review
+    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01')  # for property
+    df['Created Date'] = df['Created Date'].fillna('1990-01-01')  # for property
+    # df['Member Since'] = df['Member Since'].fillna('1990-01-01')  # for review
     print('finished reading file')
     insert_into_database(df, ColumnInfo.property, verbose=False)
 

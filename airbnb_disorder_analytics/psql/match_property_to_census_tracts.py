@@ -73,6 +73,8 @@ def get_census_tract_by_geo_info(longitude, latitude, verbose=True):
             geocoded_result = cg.coordinates(x=longitude, y=latitude)
         except ValueError:
             time.sleep(random.random())
+        except KeyError:
+            time.sleep(random.random())
     assert len(geocoded_result)
     census_block_id = geocoded_result['2010 Census Blocks'][0]['GEOID']
     census_tract_id = geocoded_result['Census Tracts'][0]['GEOID']
