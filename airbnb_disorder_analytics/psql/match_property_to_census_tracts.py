@@ -68,7 +68,12 @@ def get_census_tract_by_geo_info(longitude, latitude, verbose=True):
                             - state_id
     """
     geocoded_result = None
+    repeated_trial = 0
     while geocoded_result is None: # repeatly calling the Census API until the program gets the right return
+        repeated_trial += 1
+        if repeated_trial > 10:
+            break
+            sys.exit()
         try:
             geocoded_result = cg.coordinates(x=longitude, y=latitude)
         except ValueError:
@@ -194,7 +199,7 @@ def geolocate_all_properties(verbose=True):
     count_of_unlocated_properties = result[0]
     while count_of_unlocated_properties:
         print('remaining unlocated properties:', count_of_unlocated_properties)
-        batch_size = min(count_of_unlocated_properties, 50)
+        batch_size = min(count_of_unlocated_properties, 200)
         geolocate_properties_by_batch(batch_size, verbose)
         count_of_unlocated_properties -= batch_size
 
