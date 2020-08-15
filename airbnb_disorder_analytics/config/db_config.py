@@ -22,7 +22,9 @@ class DBInfo:
     try:
         importlib.reload(keys)
         airbnb_config = "dbname={} user='postgres' host='localhost' password={}".format('airbnb_data', base64.b64decode(keys.psql_password).decode("utf-8"))
-        acs_config = "dbname={} user='postgres' host='localhost' password={}".format('acs5', base64.b64decode(keys.psql_password).decode("utf-8"))
+        acs5_config = "dbname={} user='postgres' host='localhost' password={}".format('acs5', base64.b64decode(keys.psql_password).decode("utf-8"))
+        crime_config = "dbname={} user='postgres' host='localhost' password={}".format('crime_data', base64.b64decode(keys.psql_password).decode("utf-8"))
     except UnicodeDecodeError:
         airbnb_config = "dbname={} user='postgres' host='localhost' password={}".format('airbnb_data', keys.psql_password)
-        acs_config = "dbname={} user='postgres' host='localhost' password={}".format('acs5', keys.psql_password)
+        acs5_config = "dbname={} user='postgres' host='localhost' password={}".format('acs5', keys.psql_password)
+        crime_config = "dbname={} user='postgres' host='localhost' password={}".format('crime_data', keys.psql_password)
