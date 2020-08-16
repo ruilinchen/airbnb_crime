@@ -248,7 +248,7 @@ class CrimeDB:
             crime_df = pd.read_csv(os.path.join(self.data_folder, self.crime_filename_by_city[city]))
             self._insert_by_pandas(city, crime_df)
 
-    def local_geolocating(self, city, year, verbose=True):
+    def local_geolocating(self, state, year, verbose=True):
         """
         geolocate crime incidents using the censusgeocode API and update the
         results into psql
@@ -264,20 +264,22 @@ class CrimeDB:
                     AND longitude != 'NaN'
                     AND census_tract_id IS NULL
                     AND year = %s
+                    AND state = %s
                     LIMIT {}
                     ;
                     """.format(self.batch_size)
-        self.crime_cursor.execute(query, (year, ))
+        self.crime_cursor.execute(query, (year, state))
         results = self.crime_cursor.fetchall()
         if len(results): # check if there are still records waiting to be geolocated
             for result in tqdm(results, total=len(results)):
                 incident_id = result[0]
                 longitude = result[1]
                 latitude = result[2]
-                output = get_census_tract_by_geo_info(longitude, latitude, verbose)
-                cdb._update_census_block_to_psql(incident_id, output['census_block_id'], output['census_tract_id'],
+                if longitude < - 50 and latitude > 20:
+                    output = get_census_tract_by_geo_info(longitude, latitude, verbose)
+                    cdb._update_census_block_to_psql(incident_id, output['census_block_id'], output['census_tract_id'],
                                                  verbose)
-                self.crime_connection.commit()
+                    self.crime_connection.commit()
         else:
             print('all the crime incidents are already labelled')
             sys.exit()
@@ -328,5 +330,6 @@ if __name__ == '__main__':
     # cdb.insert_crimes_into_psql('sf')
     #cdb.drop_crimes_by_year()
     while True:
-        cdb.local_geolocating(city='boston', year=2019, verbose=False)
+        cdb.local_geolocating(state='MA', year=2019, verbose=False)
+        # CA, IL, TX, NY, MA
 
