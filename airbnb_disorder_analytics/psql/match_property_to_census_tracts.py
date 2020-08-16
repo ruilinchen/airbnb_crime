@@ -95,7 +95,6 @@ def get_census_tract_by_geo_info(longitude, latitude, verbose=True):
         pprint(matched_dict)
     return matched_dict
 
-
 def update_census_block_to_psql(property_id, census_block_id, census_tract_id, verbose=True):
     """
     insert the matching result between airbnb property and their census block info into psql
