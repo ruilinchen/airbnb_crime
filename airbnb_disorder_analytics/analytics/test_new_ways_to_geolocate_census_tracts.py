@@ -23,6 +23,7 @@ import psycopg2
 from scipy.spatial import cKDTree
 # local import
 from airbnb_disorder_analytics.config.db_config import DBInfo
+from airbnb_disorder_analytics.config.us_states import USStates
 
 airbnb_connection = psycopg2.connect(DBInfo.airbnb_config)
 airbnb_cursor = airbnb_connection.cursor()
@@ -76,7 +77,8 @@ def get_records_to_geolocate(state_id): # include geolocated records in both air
                 AND census_tracts.state_id = %s
                 ;
                 """
-    crime_cursor.execute(query, (str(state_id),))
+    crime_cursor.execute(query, (state_id,))
+    state = uss.abbr_to_name[uss.fips_to_abbr[state_id]]
     list_of_records = crime_cursor.fetchall()
     query = """SELECT property.longitude, property.latitude, property.census_tract_id
                 FROM property, census_tract
@@ -85,13 +87,12 @@ def get_records_to_geolocate(state_id): # include geolocated records in both air
                 AND property.longitude != 'NaN'
                 AND property.census_tract_id IS NOT NULL
                 AND property.census_tract_id != 'NaN'
-                AND census_tract.state_id = %s
+                AND property.state = %s
                 ;
             """
-    airbnb_cursor.execute(query, (str(state_id),))
+    airbnb_cursor.execute(query, (state,))
     another_list_of_records = airbnb_cursor.fetchall()
     full_list = list_of_records + another_list_of_records
-    random.shuffle(full_list)
     return full_list
 
 def ckdnearest(all_nodes, target_node, k=3):
@@ -102,34 +103,39 @@ def ckdnearest(all_nodes, target_node, k=3):
     indices_of_min = np.argpartition(dist, k)[:k]
     return indices_of_min, dist[indices_of_min]
 
-state_id = '25' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
 
-list_of_records = get_records_to_geolocate(state_id)
-all_census_tracts = [a_record[2] for a_record in list_of_records]
-all_nodes = [np.array([[a_record[0], a_record[1]]]) for a_record in list_of_records]
+if __name__ == '__main__':
+    state_abbr = 'MA' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
+    uss = USStates()
+    state_id = uss.abbr_to_fips[state_abbr]
 
-number_of_features = 1
-list_of_nearest_dists = []
-list_of_matched_flag = []
+    list_of_records = get_records_to_geolocate(state_id)
+    all_census_tracts = [a_record[2] for a_record in list_of_records]
+    all_nodes = [np.array([[a_record[0], a_record[1]]]) for a_record in list_of_records]
 
-batch_size = 10000
-for index, a_record in tqdm(enumerate(list_of_records), total=batch_size):
-    target_node = np.array([[a_record[0], a_record[1]]])
-    #source_nodes = all_nodes[:index] + all_nodes[index+1:]
-    target_census_tract = a_record[2]
-    nearest_node_indices, nearest_dists = ckdnearest(all_nodes[:index] + all_nodes[index+1:],
-                                                 target_node, k=number_of_features)
-    nearest_census_tract_index = nearest_node_indices[0] + int(nearest_node_indices[0] >= index)
-    nearest_census_tract = all_census_tracts[nearest_census_tract_index]
-    list_of_nearest_dists.append(nearest_dists)
-    list_of_matched_flag.append(int(nearest_census_tract == target_census_tract))
-    if index > batch_size:
-        break
+    number_of_features = 1
+    list_of_nearest_dists = []
+    list_of_matched_flag = []
 
-# change class_weight to penalize false_positive
-model = NearestClassifier(X=list_of_nearest_dists, Y=list_of_matched_flag, k=number_of_features)
-model.train_classifier()
-#model.save_classifier('matching_classifier_IL.pkl')
+    batch_size = 10000
+    for index, a_record in tqdm(enumerate(list_of_records), total=batch_size):
+        target_node = np.array([[a_record[0], a_record[1]]])
+        #source_nodes = all_nodes[:index] + all_nodes[index+1:]
+        target_census_tract = a_record[2]
+        nearest_node_indices, nearest_dists = ckdnearest(all_nodes[:index] + all_nodes[index+1:],
+                                                     target_node, k=number_of_features)
+        nearest_census_tract_index = nearest_node_indices[0] + int(nearest_node_indices[0] >= index)
+        nearest_census_tract = all_census_tracts[nearest_census_tract_index]
+        list_of_nearest_dists.append(nearest_dists)
+        list_of_matched_flag.append(int(nearest_census_tract == target_census_tract))
+        if index > batch_size:
+            break
+
+    # change class_weight to penalize false_positive
+    model = NearestClassifier(X=list_of_nearest_dists, Y=list_of_matched_flag, k=number_of_features)
+    model.train_classifier()
+    model.save_classifier(f'matching_classifier_{state_abbr}.pkl')
+    print('saved model to classifier')
 
 
 

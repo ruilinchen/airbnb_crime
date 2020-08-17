@@ -50,6 +50,7 @@ def get_filenames_by_region(region):
         'property': property_file
     }
 
+# todo insert airbnb into property
 
 def insert_into_database(a_df, column_dict, verbose=True):
     '''
@@ -74,7 +75,7 @@ def insert_into_database(a_df, column_dict, verbose=True):
             cursor.execute(insert_query, tuple(row))
             if verbose:
                 print(cursor.fetchone())
-                connection.commit()
+            connection.commit()
         except (Exception, psycopg2.Error) as error:
             print('\nerror:', error)
             print(tuple(row))
