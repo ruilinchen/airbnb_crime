@@ -34,7 +34,7 @@ connection = psycopg2.connect(DBInfo.airbnb_config)
 cursor = connection.cursor()
 
 
-def get_unlocated_properties(num_of_properties=10):
+def get_unlocated_properties(state=None, num_of_properties=10):
     """
     get longitude and latitude for listings that are yet to be geolocated,
     meaning that the census tracts in which they are located have not been identified.
@@ -42,15 +42,28 @@ def get_unlocated_properties(num_of_properties=10):
     :param num_of_properties: int -> how many properties to return
     :return: list_of_properties: list -> [(property_id, longitude, latitude)...]
     """
-    query = """SELECT property_id, longitude, latitude
-                    FROM property
-                    WHERE census_tract_id IS NULL 
-                    LIMIT {}
-                    ;
-                """.format(num_of_properties)
-    cursor.execute(query)
-    list_of_properties = cursor.fetchall()
-    return list_of_properties
+    if state is None:
+        query = """SELECT property_id, longitude, latitude
+                        FROM property
+                        WHERE census_tract_id IS NULL 
+                        LIMIT {}
+                        ;
+                    """.format(num_of_properties)
+        cursor.execute(query)
+        list_of_properties = cursor.fetchall()
+        return list_of_properties
+    else:
+        query = """SELECT property_id, longitude, latitude
+                        FROM property
+                        WHERE census_tract_id IS NULL 
+                        AND state = %s
+                        LIMIT {}
+                        ;
+                    """.format(num_of_properties)
+        cursor.execute(query, (state, ))
+        list_of_properties = cursor.fetchall()
+        return list_of_properties
+
 
 
 def get_census_tract_by_geo_info(longitude, latitude, verbose=True):
@@ -156,7 +169,7 @@ def update_census_tract_to_psql(census_tract_id, county_id, state_id, verbose=Tr
     return True
 
 
-def geolocate_properties_by_batch(batch_size=10, verbose=True):
+def geolocate_properties_by_batch(state, batch_size=10, verbose=True):
     """
     geolocate unlocated properties through the following steps:
         - get geo-info of the unlocated properties from database
@@ -168,7 +181,7 @@ def geolocate_properties_by_batch(batch_size=10, verbose=True):
     :param: verbose: boolean -> whether to print detailed outputs as the program runs
     :return: True
     """
-    list_of_unlocated_properties = get_unlocated_properties(batch_size)
+    list_of_unlocated_properties = get_unlocated_properties(state, batch_size)
     for property_id, longitude, latitude in tqdm(list_of_unlocated_properties):
         matched_result = get_census_tract_by_geo_info(longitude, latitude, verbose)
         census_block_id = matched_result['census_block_id']
@@ -180,7 +193,7 @@ def geolocate_properties_by_batch(batch_size=10, verbose=True):
         connection.commit()
 
 
-def geolocate_all_properties(verbose=True):
+def geolocate_all_properties(state, verbose=True):
     """
     geolocate all unlocated properties by calling geolocate_properties_by_batch() until
     count of unlocated properties equal to zero
@@ -188,20 +201,31 @@ def geolocate_all_properties(verbose=True):
     :param: verbose: boolean -> whether to print detailed outputs as the program runs
     :return: True
     """
-    query = """SELECT COUNT(*) 
-                FROM property
-                WHERE census_block_id IS NULL 
-                ;
-                """ # this query counts the number of unlocated properties in psql
-    cursor.execute(query)
-    result = cursor.fetchone()
-    count_of_unlocated_properties = result[0]
+    if state is None:
+        query = """SELECT COUNT(*) 
+                    FROM property
+                    WHERE census_block_id IS NULL 
+                    ;
+                    """ # this query counts the number of unlocated properties in psql
+        cursor.execute(query)
+        result = cursor.fetchone()
+        count_of_unlocated_properties = result[0]
+    else:
+        query = """SELECT COUNT(*) 
+                    FROM property
+                    WHERE census_block_id IS NULL 
+                    AND state = %s
+                    ;
+                    """ # this query counts the number of unlocated properties in psql
+        cursor.execute(query, (state, ))
+        result = cursor.fetchone()
+        count_of_unlocated_properties = result[0]
     while count_of_unlocated_properties:
         print('remaining unlocated properties:', count_of_unlocated_properties)
         batch_size = min(count_of_unlocated_properties, 200)
-        geolocate_properties_by_batch(batch_size, verbose)
+        geolocate_properties_by_batch(state, batch_size, verbose)
         count_of_unlocated_properties -= batch_size
 
 
 if __name__ == '__main__':
-    geolocate_all_properties(verbose=False)
+    geolocate_all_properties(state='New York', verbose=False)

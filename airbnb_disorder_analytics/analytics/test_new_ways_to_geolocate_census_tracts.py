@@ -14,6 +14,8 @@ ruilin chen
 08/15/2020
 '''
 # system import
+import os
+import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import pickle
@@ -103,39 +105,111 @@ def ckdnearest(all_nodes, target_node, k=3):
     indices_of_min = np.argpartition(dist, k)[:k]
     return indices_of_min, dist[indices_of_min]
 
+def get_census_tract_id_from_code(acs_cursor, state_abbr):
+    query = """SELECT census_tract_id, census_tract_code
+                FROM census_tracts
+                WHERE state_abbr = %s
+                ;
+                """
+    acs_cursor.execute(query, (state_abbr,))
+    results = acs_cursor.fetchall()
+    code_to_id = {item[1]: item[0] for item in results}
+    return code_to_id
+
+def insert_by_pandas(city, state_abbr, crime_df, crime_columns=None, batch_size=10000):
+    """
+    insert crime incidents stored in a pandas dataframe into psql
+
+    :param city: st
+    :param crime_df: a pandas dataframe with the raw data
+    :param crime_columns: a dictionary with the keys being psql columns and values being the
+                            corresponding pandas columns
+    :return: None
+    """
+    error_count = 0
+    if isinstance(crime_columns['date'], list):
+        # if the crime date are stored in two separate columns, one for date and one for time of day,
+        # create a new column and combine them
+        crime_df['combined_date_time'] = crime_df[crime_columns['date'][0]] + ' ' + crime_df[
+            crime_columns['date'][1]]
+        crime_columns['date'] = 'combined_date_time'
+    for index, row in tqdm(crime_df.iterrows(), total=len(crime_df)):
+        incident_id = row[crime_columns['incident_id']]
+        description = row[crime_columns['description']]
+        longitude = row[crime_columns['longitude']]
+        latitude = row[crime_columns['latitude']]
+        census_tract_code = row[crime_columns['census_tract']]
+        try:
+            census_tract_id = code_to_id[census_tract_code]
+        except KeyError:
+            error_count += 1
+            continue
+        try:
+            year = pd.to_datetime(row[crime_columns['date']]).year
+        # if the provided date is out of bound, ignore the entry
+        except pd._libs.tslibs.np_datetime.OutOfBoundsDatetime:
+            error_count += 1
+            continue
+        date = row[crime_columns['date']]
+        # if date is not provided, print the row,
+        # ignore the entry and increment the error_count by 1
+        if pd.isnull(date):
+            print(row)
+            error_count += 1
+        else:
+            if pd.isnull(longitude) and pd.isnull(latitude):
+                # if none of the longitude, latitude and address columns have meaningful information,
+                # ignore the record and increment the error_count by 1
+                error_count += 1
+            else:
+                query = """INSERT INTO crime_incident (incident_id, description, longitude, latitude, census_tract_id, year, city, state, date) 
+                                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                    ON CONFLICT (incident_id) DO NOTHING
+                                    RETURNING incident_id
+                                    ;
+                                """
+                values = (incident_id, description, longitude, latitude, census_tract_id, year, city, state_abbr, date)
+                crime_cursor.execute(query, values)
+                if index % batch_size == 0:
+                    crime_connection.commit()
+    crime_connection.commit()
+    print('== error count:', error_count)
+
 
 if __name__ == '__main__':
-    state_abbr = 'MA' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
+    city = 'DC'
+    state_abbr = 'DC' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
     uss = USStates()
     state_id = uss.abbr_to_fips[state_abbr]
+    acs5_connection = psycopg2.connect(DBInfo.acs5_config)
+    acs5_cursor = acs5_connection.cursor()
+    crime_connection = psycopg2.connect(DBInfo.crime_config)
+    crime_cursor = crime_connection.cursor()
 
-    list_of_records = get_records_to_geolocate(state_id)
-    all_census_tracts = [a_record[2] for a_record in list_of_records]
-    all_nodes = [np.array([[a_record[0], a_record[1]]]) for a_record in list_of_records]
+    data_folder = '/home/rchen/Documents/github/airbnb_crime/data/crime_data'
+    crime_filenames = ['DC_Crime_Incidents_in_2019.csv',
+                      'DC_Crime_Incidents_in_2018.csv',
+                      'DC_Crime_Incidents_in_2017.csv',
+                      'DC_Crime_Incidents_in_2016.csv',
+                      'DC_Crime_Incidents_in_2015.csv',
+                      'DC_Crime_Incidents_in_2014.csv'
+                      ]
+    crime_columns = {'incident_id': 'CCN',
+                     'description': 'OFFENSE',
+                     'longitude': 'LONGITUDE',
+                     'latitude': 'LATITUDE',
+                     'date': 'REPORT_DAT',
+                     'census_tract': 'CENSUS_TRACT'
+                     }
+    code_to_id = get_census_tract_id_from_code(acs_cursor=acs5_cursor, state_abbr='DC')
 
-    number_of_features = 1
-    list_of_nearest_dists = []
-    list_of_matched_flag = []
+    for crime_file in crime_filenames:
+        df = pd.read_csv(os.path.join(data_folder, crime_file))
+        #print(df.columns)
+        df['CENSUS_TRACT'] = df['CENSUS_TRACT'].astype('Int64').astype(str).str.zfill(5)
+        insert_by_pandas(city, state_abbr, df, crime_columns=crime_columns)
 
-    batch_size = 10000
-    for index, a_record in tqdm(enumerate(list_of_records), total=batch_size):
-        target_node = np.array([[a_record[0], a_record[1]]])
-        #source_nodes = all_nodes[:index] + all_nodes[index+1:]
-        target_census_tract = a_record[2]
-        nearest_node_indices, nearest_dists = ckdnearest(all_nodes[:index] + all_nodes[index+1:],
-                                                     target_node, k=number_of_features)
-        nearest_census_tract_index = nearest_node_indices[0] + int(nearest_node_indices[0] >= index)
-        nearest_census_tract = all_census_tracts[nearest_census_tract_index]
-        list_of_nearest_dists.append(nearest_dists)
-        list_of_matched_flag.append(int(nearest_census_tract == target_census_tract))
-        if index > batch_size:
-            break
 
-    # change class_weight to penalize false_positive
-    model = NearestClassifier(X=list_of_nearest_dists, Y=list_of_matched_flag, k=number_of_features)
-    model.train_classifier()
-    model.save_classifier(f'matching_classifier_{state_abbr}.pkl')
-    print('saved model to classifier')
 
 
 

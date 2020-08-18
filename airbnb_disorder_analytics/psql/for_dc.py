@@ -19,6 +19,7 @@ import pandas as pd
 import numpy as np
 from tqdm import tqdm
 import pickle
+import sys
 import random
 # third-party import
 import psycopg2
@@ -97,11 +98,13 @@ def get_records_to_geolocate(state_id): # include geolocated records in both air
     full_list = list_of_records + another_list_of_records
     return full_list
 
-def ckdnearest(all_nodes, target_node, k=3):
+def ckdnearest(all_nodes, target_node, k=1):
     # k specifies the number of smallest values to return
     btree = cKDTree(target_node)
     dist, idx = btree.query(all_nodes, k=1)
     dist = dist.flatten()
+    if k == 1:
+        return np.argmin(dist), min(dist)
     indices_of_min = np.argpartition(dist, k)[:k]
     return indices_of_min, dist[indices_of_min]
 
@@ -186,31 +189,40 @@ def get_geolocated_points_by_state(state_abbr):  # include geolocated records in
                     AND crime_incident.census_tract_id IS NOT NULL
                     AND crime_incident.census_tract_id != 'NaN'
                     AND census_tracts.state_id = %s
+                    AND crime_incident.year >= 2017
                     ;
                     """
     crime_cursor.execute(query, (state_id,))
     all_geolocated_points = crime_cursor.fetchall()
     return all_geolocated_points
 
-def get_airbnb_points_to_geolocate(state_abbr):
+def geolocate_airbnb_points(state_abbr, batch_size, verbose=True):
     state = uss.abbr_to_name[state_abbr]
-    query = """SELECT property.longitude, property.latitude
+    query = """SELECT property.property_id, property.longitude, property.latitude
                 FROM property
                 WHERE property.longitude IS NOT NULL
                 AND property.longitude != 'NaN'
                 AND property.census_tract_id IS NULL
                 AND property.state = %s
+                LIMIT {}
                 ;
-            """
+            """.format(batch_size)
     airbnb_cursor.execute(query, (state, ))
-    return airbnb_cursor.fetchall()
+    results = airbnb_cursor.fetchall()
+    if len(results) == 0:
+        print('all the entries are already labelled')
+        sys.exit()
+    for property_id, longitude, latitude in tqdm(results, total=len(results)):
+        census_tract_id = geolocate_point(longitude, latitude)
+        update_census_tract_to_psql(property_id, census_tract_id, verbose)
+        airbnb_connection.commit()
 
 def load_classifer(pkl_name):
     with open(pkl_name, 'rb') as file:
         pickle_model = pickle.load(file)
     return pickle_model
 
-def predict_matching(clf, input):
+def predict_matching(input):
     output = clf.predict(np.array([input]).reshape(1, -1))
     return bool(output[0])
 
@@ -220,8 +232,32 @@ def geolocate_point(longitude, latitude):
     matched_flag = predict_matching(nearest_dist)
     if matched_flag:
         nearest_census_tract = all_geolocated_points[nearest_node_index][2]
-        print('matched succeeded. predicted_census_tract:', nearest_census_tract)
+        # print('matched succeeded. predicted_census_tract:', nearest_census_tract)
         return nearest_census_tract
+
+def update_census_tract_to_psql(incident_id, census_tract_id, verbose=True):
+    """
+    insert the matching result between crime incidents and their census block info into psql
+    as census block is defined to be child of census tract, the update also requires information
+    on the census tract to which this block belongs.
+
+    called inside the local_geolocating function
+
+    :param incident_id: str
+    :param census_tract_id: str
+    :param: verbose: boolean -> whether to print detailed outputs as the program runs
+    :return: True
+    """
+    query = """UPDATE property
+                SET census_tract_id = %s
+                WHERE property_id = %s 
+                RETURNING property_id
+                """
+    airbnb_cursor.execute(query, (census_tract_id, incident_id))
+    query_output = airbnb_cursor.fetchone()
+    if verbose:
+        print('updated property:', query_output)
+    return True
 
 if __name__ == '__main__':
     city = 'DC'
@@ -237,6 +273,7 @@ if __name__ == '__main__':
     uss = USStates()
 
     data_folder = '/home/rchen/Documents/github/airbnb_crime/data/crime_data'
+    code_folder = '/home/rchen/Documents/github/airbnb_crime/airbnb_disorder_analytics/psql'
     crime_filenames = ['DC_Crime_Incidents_in_2019.csv',
                       'DC_Crime_Incidents_in_2018.csv',
                       'DC_Crime_Incidents_in_2017.csv',
@@ -260,6 +297,10 @@ if __name__ == '__main__':
     #     insert_by_pandas(city, state_abbr, df, crime_columns=crime_columns)
     all_geolocated_points = get_geolocated_points_by_state(state_abbr)
     all_geolocated_nodes = np.array([[point[0], point[1]] for point in all_geolocated_points])
+    clf = load_classifer(os.path.join(code_folder, 'matching_classifier_DC.pkl'))
+    while True:
+        geolocate_airbnb_points(state_abbr, batch_size=10000, verbose=False)
+
 
 
 

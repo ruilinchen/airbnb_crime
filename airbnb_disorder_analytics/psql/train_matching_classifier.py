@@ -66,18 +66,32 @@ class NearestClassifier:
             pickle_model = pickle.load(file)
         self.clf = pickle_model
 
-def get_records_to_geolocate(state_id): # include geolocated records in both airbnb_data and crime_data
-    query = """SELECT crime_incident.longitude, crime_incident.latitude, crime_incident.census_tract_id
-                FROM crime_incident, census_tracts
-                WHERE crime_incident.census_tract_id = census_tracts.census_tract_id
-                AND crime_incident.longitude IS NOT NULL
-                AND crime_incident.longitude != 'NaN'
-                AND crime_incident.census_tract_id IS NOT NULL
-                AND crime_incident.census_tract_id != 'NaN'
-                AND census_tracts.state_id = %s
-                ;
-                """
-    crime_cursor.execute(query, (state_id,))
+def get_records_to_geolocate(state_id, year=None): # include geolocated records in both airbnb_data and crime_data
+    if year is None:
+        query = """SELECT crime_incident.longitude, crime_incident.latitude, crime_incident.census_tract_id
+                    FROM crime_incident, census_tracts
+                    WHERE crime_incident.census_tract_id = census_tracts.census_tract_id
+                    AND crime_incident.longitude IS NOT NULL
+                    AND crime_incident.longitude != 'NaN'
+                    AND crime_incident.census_tract_id IS NOT NULL
+                    AND crime_incident.census_tract_id != 'NaN'
+                    AND census_tracts.state_id = %s
+                    ;
+                    """
+        crime_cursor.execute(query, (state_id,))
+    else:
+        query = """SELECT crime_incident.longitude, crime_incident.latitude, crime_incident.census_tract_id
+                    FROM crime_incident, census_tracts
+                    WHERE crime_incident.census_tract_id = census_tracts.census_tract_id
+                    AND crime_incident.longitude IS NOT NULL
+                    AND crime_incident.longitude != 'NaN'
+                    AND crime_incident.census_tract_id IS NOT NULL
+                    AND crime_incident.census_tract_id != 'NaN'
+                    AND census_tracts.state_id = %s
+                    AND crime_incident.year >= %s
+                    ;
+                    """
+        crime_cursor.execute(query, (state_id, year))
     state = uss.abbr_to_name[uss.fips_to_abbr[state_id]]
     list_of_records = crime_cursor.fetchall()
     query = """SELECT property.longitude, property.latitude, property.census_tract_id
@@ -105,11 +119,12 @@ def ckdnearest(all_nodes, target_node, k=3):
 
 
 if __name__ == '__main__':
-    state_abbr = 'TX' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
+    state_abbr = 'IL' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17, DC
     uss = USStates()
     state_id = uss.abbr_to_fips[state_abbr]
+    year_threshold = 2017
 
-    list_of_records = get_records_to_geolocate(state_id)
+    list_of_records = get_records_to_geolocate(state_id, year=year_threshold)
     all_census_tracts = [a_record[2] for a_record in list_of_records]
     all_nodes = [np.array([[a_record[0], a_record[1]]]) for a_record in list_of_records]
 
@@ -117,7 +132,7 @@ if __name__ == '__main__':
     list_of_nearest_dists = []
     list_of_matched_flag = []
 
-    batch_size = 10000
+    batch_size = 20000
     for index, a_record in tqdm(enumerate(list_of_records), total=batch_size):
         target_node = np.array([[a_record[0], a_record[1]]])
         #source_nodes = all_nodes[:index] + all_nodes[index+1:]

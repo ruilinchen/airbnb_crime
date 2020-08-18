@@ -94,7 +94,7 @@ class CrimeDB:
             'chicago': 'Chicago_Crimes_-_2019.csv',
             'dc': 'DC_Crime_Incidents_in_2019.csv',
             'la': 'LA_Crime_Data_from_2010_to_2019.csv',
-            'nyc': 'NY_Complaint_Data_2019.csv',
+            'nyc': ['NY_Complaint_Data_2020.csv', 'NY_Complaint_Data_from_2014_to_2019.csv'],
             'seattle': 'Seattle_from_2008_to_2019.csv',
             'sf': ['SF_Police_Department_Incident_Reports__2018_to_Present.csv',
                     'SF_Police_Department_Incident_Reports__Historical_2003_to_May_2018.csv']
@@ -122,11 +122,16 @@ class CrimeDB:
                        'longitude': 'LON',
                        'latitude': 'LAT',
                        'date': 'DATE OCC'},
-            'nyc':{'incident_id': 'CMPLNT_NUM',
+            'nyc':[{'incident_id': 'CMPLNT_NUM',
                        'description': 'OFNS_DESC',
                        'longitude': 'Longitude',
                        'latitude': 'Latitude',
                        'date': ['CMPLNT_FR_DT', 'CMPLNT_FR_TM']},
+                   {'incident_id': 'CMPLNT_NUM',
+                    'description': 'OFNS_DESC',
+                    'longitude': 'Longitude',
+                    'latitude': 'Latitude',
+                    'date': ['CMPLNT_FR_DT', 'CMPLNT_FR_TM']}],
             'seattle':{'incident_id': 'ID',
                        'description': 'Description',
                        'longitude': 'Longitude',
@@ -211,7 +216,7 @@ class CrimeDB:
         self.crime_connection.commit()
         print('deleted records:', count_of_results)
 
-    def _insert_by_pandas(self, city, crime_df, crime_columns=None):
+    def _insert_by_pandas(self, city, crime_df, crime_columns=None, year_threshold=None):
         """
         insert crime incidents stored in a pandas dataframe into psql
 
@@ -237,6 +242,8 @@ class CrimeDB:
             latitude = row[crime_columns['latitude']]
             try:
                 year = pd.to_datetime(row[crime_columns['date']]).year
+                if year_threshold is not None and year < year_threshold:
+                    continue
             # if the provided date is out of bound, ignore the entry
             except pd._libs.tslibs.np_datetime.OutOfBoundsDatetime:
                 error_count += 1
@@ -278,9 +285,10 @@ class CrimeDB:
                     self.crime_cursor.execute(query, values)
                     if index % self.batch_size == 0:
                         self.crime_connection.commit()
+        self.crime_connection.commit()
         print('== error count:', error_count)
 
-    def insert_crimes_into_psql(self, city):
+    def insert_crimes_into_psql(self, city, year_threshold=None):
         """
         insert crime incidents into psql by city
 
@@ -291,7 +299,8 @@ class CrimeDB:
             # if raw data for the city are stored in more than one file
             for index, filename in enumerate(self.crime_filename_by_city[city]):
                 crime_df = pd.read_csv(os.path.join(self.data_folder, filename))
-                self._insert_by_pandas(city, crime_df,  crime_columns=self.crime_columns_by_city[city][index])
+                self._insert_by_pandas(city, crime_df,  crime_columns=self.crime_columns_by_city[city][index],
+                                       year_threshold=year_threshold)
         else:
             crime_df = pd.read_csv(os.path.join(self.data_folder, self.crime_filename_by_city[city]))
             self._insert_by_pandas(city, crime_df)
@@ -362,7 +371,7 @@ class CrimeDB:
             print('matched failed. queried_census_tract:', queried_output['census_tract_id'])
             return queried_output['census_tract_id']
 
-    def local_geolocating(self, year, verbose=True):
+    def local_geolocating(self, year=None, verbose=True):
         """
         geolocate crime incidents using the censusgeocode API and update the
         results into psql
@@ -373,18 +382,31 @@ class CrimeDB:
         :return:
         """
         self.get_geolocated_points_by_state()
-        query = """SELECT incident_id, longitude, latitude
-                    FROM crime_incident
-                    WHERE longitude IS NOT NULL
-                    AND longitude != 'NaN'
-                    AND latitude > 0
-                    AND census_tract_id IS NULL
-                    AND year = %s
-                    AND state = %s
-                    LIMIT {}
-                    ;
-                    """.format(self.batch_size)
-        self.crime_cursor.execute(query, (year, self.state_abbr))
+        if year is not None:
+            query = """SELECT incident_id, longitude, latitude
+                        FROM crime_incident
+                        WHERE longitude IS NOT NULL
+                        AND longitude != 'NaN'
+                        AND latitude > 0
+                        AND census_tract_id IS NULL
+                        AND year = %s
+                        AND state = %s
+                        LIMIT {}
+                        ;
+                        """.format(self.batch_size)
+            self.crime_cursor.execute(query, (year, self.state_abbr))
+        else:
+            query = """SELECT incident_id, longitude, latitude
+                        FROM crime_incident
+                        WHERE longitude IS NOT NULL
+                        AND longitude != 'NaN'
+                        AND latitude > 0
+                        AND census_tract_id IS NULL
+                        AND state = %s
+                        LIMIT {}
+                        ;
+                        """.format(self.batch_size)
+            self.crime_cursor.execute(query, (self.state_abbr, ))
         results = self.crime_cursor.fetchall()
         if len(results): # check if there are still records waiting to be geolocated
             for result in tqdm(results, total=len(results)):
@@ -437,24 +459,25 @@ class CrimeDB:
 
 
 if __name__ == '__main__':
-    # connect to database
+    ## connect to database
     crime_connection = psycopg2.connect(DBInfo.crime_config)
     crime_cursor = crime_connection.cursor()
     acs5_connection = psycopg2.connect(DBInfo.acs5_config)
     acs5_cursor = acs5_connection.cursor()
     airbnb_connection = psycopg2.connect(DBInfo.airbnb_config)
     airbnb_cursor = airbnb_connection.cursor()
-    # set up CrimeDB
-    cdb = CrimeDB(state_abbr='MA')  # CA, IL, TX, NY, MA
+    ## set up CrimeDB
+    cdb = CrimeDB(state_abbr='CA')  # CA, IL, MA
     cdb.connect_to_db(acs5={'connection': acs5_connection, 'cursor':acs5_cursor},
                       crime={'connection': crime_connection, 'cursor': crime_cursor},
                       airbnb={'connection': airbnb_connection, 'cursor': airbnb_cursor})
-    # copy the table census tracts from acs5
+    ## copy the table census tracts from acs5
     # cdb.copy_census_tracts_from_acs5()
-    # import crime data from pandas to psql
-    # cdb.insert_crimes_into_psql('sf')
-    #cdb.drop_crimes_by_year()
+    ## import crime data from pandas to psql
+    # cdb.insert_crimes_into_psql('nyc', year_threshold=2014) # austin, boston, chicago, dc, la, nyc, seattle, sf
+    # cdb.drop_crimes_by_year(2014)
+    ## geolocate crime using airbnb
     cdb.batch_size = 10000
     while True:
-        # cdb.local_geolocating(year=2019, verbose=False)
-        cdb.local_geolocating(year=2018, verbose=False)
+        #cdb.local_geolocating(year=2019, verbose=False)
+        cdb.local_geolocating(verbose=False)
