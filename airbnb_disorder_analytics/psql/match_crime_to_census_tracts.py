@@ -21,12 +21,16 @@ from tqdm import tqdm
 import pandas as pd
 import numpy as np
 import pickle
+import random
+import time
+from pprint import pprint
 # third-party import
 import psycopg2
 from scipy.spatial import cKDTree
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
+import censusgeocode as cg
 # local import
 from airbnb_disorder_analytics.config.db_config import DBInfo
 from airbnb_disorder_analytics.psql.match_property_to_census_tracts import get_census_tract_by_geo_info
@@ -83,6 +87,7 @@ class CrimeDB:
         self.batch_size = 200
         self.state_abbr = state_abbr
         self.state_id = self.uss.abbr_to_fips[state_abbr]
+        self.city = None
         self.all_geolocated_points = None
         self.all_geolocated_nodes = None
         self.matching_classifier_name = f'matching_classifier_{self.state_abbr.upper()}.pkl'
@@ -320,6 +325,9 @@ class CrimeDB:
             crime_cursor.execute(query, (self.state_id,))
             state = self.uss.abbr_to_name[self.state_abbr]
             list_of_records = crime_cursor.fetchall()
+            if len(list_of_records) > 200000:
+                random.shuffle(list_of_records)
+                list_of_records = list_of_records[:200000]
             query = """SELECT property.longitude, property.latitude, property.census_tract_id
                         FROM property, census_tract
                         WHERE property.census_tract_id = census_tract.census_tract_id
@@ -332,7 +340,10 @@ class CrimeDB:
                     """
             airbnb_cursor.execute(query, (state,))
             another_list_of_records = airbnb_cursor.fetchall()
+            random.shuffle(another_list_of_records)
             self.all_geolocated_points = list_of_records + another_list_of_records
+            random.shuffle(self.all_geolocated_points)
+            self.all_geolocated_points = self.all_geolocated_points[:200000]
             self.all_geolocated_nodes = np.array([[point[0], point[1]] for point in self.all_geolocated_points])
 
     @staticmethod
@@ -369,7 +380,116 @@ class CrimeDB:
         else:
             queried_output = get_census_tract_by_geo_info(longitude, latitude, verbose)['census_tract_id']
             print('matched failed. queried_census_tract:', queried_output['census_tract_id'])
-            return queried_output['census_tract_id']
+            return queried_output['censusact_id']
+
+    def get_census_tract_by_address(self, address, verbose=True):
+        """
+        find the census tract to which a given point defined by their
+        longitude and latitude belongs.
+
+        :param longitude: float
+
+        :param latitude: float
+        :param: verbose: boolean -> whether to print detailed outputs as the program runs
+        :return: matched_dict: dictionary with four keys:
+                                - census_block_id
+                                - census_tract_id
+                                - county_id
+                                - state_id
+        """
+        geocoded_result = None
+        repeated_trial = 0
+        while geocoded_result is None:  # repeatly calling the Census API until the program gets the right return
+            repeated_trial += 1
+            if repeated_trial >= 3:
+                return None
+            try:
+                one_line_address = ", ".join([address, self.city.title(), self.city_to_state[self.city]])
+                geocoded_result = cg.onelineaddress(one_line_address)
+                if len(geocoded_result) == 0:
+                    geocoded_result = None
+            except ValueError:
+                time.sleep(random.random())
+            except KeyError:
+                time.sleep(random.random())
+        assert len(geocoded_result)
+        longitude = list(geocoded_result)[0]['coordinates']['x']
+        latitude = list(geocoded_result)[0]['coordinates']['y']
+        census_block_id = list(geocoded_result)[0]['geographies']['2010 Census Blocks'][0]['GEOID']
+        census_tract_id = census_block_id[:-4]
+        county_id = census_block_id[:5]
+        state_id = census_block_id[:2]
+        matched_dict = {
+            'longitude': longitude,
+            'latitude': latitude,
+            'census_block_id': census_block_id,
+            'census_tract_id': census_tract_id,
+            'county_id': county_id,
+            'state_id': state_id
+        }
+        if verbose:
+            pprint(matched_dict)
+        return matched_dict
+
+    def address_geolocating(self, year=None, verbose=True):
+        """
+        geolocate crime incidents using the censusgeocode API and update the
+        results into psql
+
+        :param city: str -> process crime incidents that happen in one city at a time
+        :param year: int -> process crime incidents that happen in one year at a time
+        :param verbose: boolean -> whether to print outputs as the program runs
+        :return:
+        """
+        if year is not None:
+            query = """SELECT incident_id, address
+                        FROM crime_incident
+                        WHERE address IS NOT NULL
+                        AND census_tract_id IS NULL
+                        AND longitude IS NULL
+                        AND year = %s
+                        AND state = %s
+                        LIMIT {}
+                        ;
+                        """.format(self.batch_size)
+            self.crime_cursor.execute(query, (year, self.state_abbr))
+        else:
+            query = """SELECT incident_id, address
+                        FROM crime_incident
+                        WHERE address IS NOT NULL
+                        AND census_tract_id IS NULL
+                        AND longitude IS NULL
+                        AND state = %s
+                        LIMIT {}
+                        ;
+                        """.format(self.batch_size)
+            self.crime_cursor.execute(query, (self.state_abbr, ))
+        results = self.crime_cursor.fetchall()
+        if len(results): # check if there are still records waiting to be geolocated
+            for result in tqdm(results, total=len(results)):
+                incident_id = result[0]
+                address = result[1].lower().replace(' block', '')
+                address = address.replace('nb', '')
+                address = address.replace('sb', '')
+                address = address.replace('ih', 'interstate')
+                address = address.replace(' s ', ' south ')
+                address = address.replace(' n ', ' north ')
+                address = address.replace(' e ', ' east ')
+                address = address.replace(' w ', ' west ')
+                if 'interstate' in address:
+                    address = address.replace('svrd', '')
+                if address != 'unknown':
+                    matched_dict = self.get_census_tract_by_address(address, verbose)
+                    if matched_dict is not None:
+                        cdb._update_census_block_to_psql(incident_id, matched_dict['census_tract_id'],
+                                                     census_block_id=matched_dict['census_block_id'],
+                                                     longitude=matched_dict['longitude'],
+                                                     latitude=matched_dict['latitude'],
+                                                     verbose=verbose)
+                        self.crime_connection.commit()
+        else:
+            print('all the crime incidents are already labelled')
+            sys.exit()
 
     def local_geolocating(self, year=None, verbose=True):
         """
@@ -422,7 +542,8 @@ class CrimeDB:
             print('all the crime incidents are already labelled')
             sys.exit()
 
-    def _update_census_block_to_psql(self, incident_id, census_tract_id, census_block_id=None, verbose=True):
+    def _update_census_block_to_psql(self, incident_id, census_tract_id, census_block_id=None,
+                                     longitude=None, latitude=None, verbose=True):
         """
         insert the matching result between crime incidents and their census block info into psql
         as census block is defined to be child of census tract, the update also requires information
@@ -436,7 +557,20 @@ class CrimeDB:
         :param: verbose: boolean -> whether to print detailed outputs as the program runs
         :return: True
         """
-        if census_block_id is not None:
+        if census_block_id is not None and longitude is not None:
+
+            query = """UPDATE crime_incident
+                        SET census_block_id = %s,
+                            census_tract_id = %s,
+                            longitude = %s,
+                            latitude = %s
+                        WHERE incident_id = %s 
+                        RETURNING incident_id
+                        """
+            self.crime_cursor.execute(query, (census_block_id, census_tract_id,
+                                            longitude, latitude, incident_id))
+            query_output = self.crime_cursor.fetchone()
+        elif census_block_id is not None:
             query = """UPDATE crime_incident
                         SET census_block_id = %s,
                             census_tract_id = %s
@@ -467,7 +601,7 @@ if __name__ == '__main__':
     airbnb_connection = psycopg2.connect(DBInfo.airbnb_config)
     airbnb_cursor = airbnb_connection.cursor()
     ## set up CrimeDB
-    cdb = CrimeDB(state_abbr='CA')  # CA, IL, MA
+    cdb = CrimeDB(state_abbr='CA')  # CA, IL, MA, TX
     cdb.connect_to_db(acs5={'connection': acs5_connection, 'cursor':acs5_cursor},
                       crime={'connection': crime_connection, 'cursor': crime_cursor},
                       airbnb={'connection': airbnb_connection, 'cursor': airbnb_cursor})
@@ -479,5 +613,9 @@ if __name__ == '__main__':
     ## geolocate crime using airbnb
     cdb.batch_size = 10000
     while True:
-        #cdb.local_geolocating(year=2019, verbose=False)
         cdb.local_geolocating(verbose=False)
+    ## geolocate TX by address
+    # cdb.batch_size = 100
+    # cdb.city = 'austin'
+    # while True:
+    #     cdb.address_geolocating(year=2019, verbose=False)

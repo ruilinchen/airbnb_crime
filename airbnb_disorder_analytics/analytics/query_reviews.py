@@ -394,6 +394,7 @@ class QueryReview:
     def _get_nouns_for_neighborhood(self):
         df = pd.read_csv(os.path.join(self.root_path, self.data_folder, 'labelled_nouns_and_types_for_adjs.csv'))
         self.list_of_nouns_for_neighborhood = df['noun'][df['type'] == 2].tolist()
+        print('nouns:', self.list_of_nouns_for_neighborhood)
 
     def count_occurences_of_keyword(self, key_words):
         query = """SELECT count(*)
@@ -538,7 +539,7 @@ class QueryReview:
         query = """SELECT reviewer_id, property_id, review_text
                     FROM review
                     WHERE review_text LIKE ANY (values {values})
-                    AND short_adjs_for_neighbor IS NULL
+                    AND really_short_adjs_for_neighbor IS NULL
                     LIMIT {size}
                     ;
                     """.format(values=self.format_keywords_for_search(self.list_of_nouns_for_neighborhood),
@@ -551,7 +552,7 @@ class QueryReview:
             print(list_of_words)
         if list_of_words is None:
             query = """UPDATE review
-                        SET short_adjs_for_neighbor = false
+                        SET really_short_adjs_for_neighbor = false
                         WHERE reviewer_id = %s
                         AND property_id = %s
                         ;
@@ -559,7 +560,7 @@ class QueryReview:
             self.airbnb_cursor.execute(query, (reviewer_id, property_id))
         else:
             query = """UPDATE review
-                        SET short_adjs_for_neighbor = %s
+                        SET really_short_adjs_for_neighbor = %s
                         WHERE reviewer_id = %s
                         AND property_id = %s
                         ;
@@ -590,48 +591,63 @@ if __name__ == '__main__':
     # print('count of reviews with neighborhood keywords:', qr.count_keywords(qr.list_of_nouns_for_neighborhood))
     # answer to this question is: 520044
 
-    """
-    count_of_processed_records = 0
-    while True:
-        list_of_records = qr.get_unadj_records_with_keywords()
-        if len(list_of_records) == 0:
-            break
-        for review_record in tqdm(list_of_records, total=qr.batch_size):
-            reviewer_id, property_id, review_text = review_record
-            sentences = qr.get_sentence_with_keywords(review_text)
-            list_of_adjs = []
-            for sentence in sentences:
-                pose = POSExtractor(sentence)
-                adjs = pose.get_all_adjs_for_keyword()
-                list_of_adjs += adjs
-                list_of_adjs += pose.get_svaos_for_keyword()
-            qr.insert_adjs_into_psql(reviewer_id, property_id, list_of_words=list_of_adjs, verbose=False)
-        count_of_processed_records += qr.batch_size
-        print('total processed records:', count_of_processed_records)
-    """
+
+    # count_of_processed_records = 0
+    # while True:
+    #     list_of_records = qr.get_unadj_records_with_keywords()
+    #     if len(list_of_records) == 0:
+    #         break
+    #     for review_record in tqdm(list_of_records, total=qr.batch_size):
+    #         reviewer_id, property_id, review_text = review_record
+    #         sentences = qr.get_sentence_with_keywords(review_text)
+    #         list_of_adjs = []
+    #         for sentence in sentences:
+    #             pose = POSExtractor(sentence)
+    #             adjs = pose.get_all_adjs_for_keyword()
+    #             list_of_adjs += adjs
+    #             list_of_adjs += pose.get_svaos_for_keyword()
+    #         qr.insert_adjs_into_psql(reviewer_id, property_id, list_of_words=list_of_adjs, verbose=False)
+    #     count_of_processed_records += qr.batch_size
+    #     print('total processed records:', count_of_processed_records)
 
 
-    query = """SELECT short_adjs_for_neighbor
+    # query = """SELECT ally_short_adjs_for_neighbor
+    #             FROM review
+    #             WHERE short_adjs_for_neighbor IS NOT NULL
+    #             AND short_adjs_for_neighbor != 'false'
+    #             AND short_adjs_for_neighbor != ''
+    #             ;
+    #             """
+    # qr.airbnb_cursor.execute(query)
+    # results = qr.airbnb_cursor.fetchall()
+    # word_freq_dict = {}
+    # for result in results:
+    #     for word in result[0].split(','):
+    #         word_freq_dict[word] = word_freq_dict.get(word, 0)+1
+    # word_freq = [(key, value) for key, value in word_freq_dict.items()]
+    # word_freq = sorted(word_freq, key=lambda item: item[1], reverse=True)
+    # print(word_freq)
+    # df = pd.DataFrame(columns=['word', 'freq'])
+    # df['word'] = [word for word, _ in word_freq]
+    # df['freq'] = [freq for _, freq in word_freq]
+    # df['is_it_safe'] = -1
+    # df['describing_neighborhood'] = -1
+    # df.to_csv(os.path.join(qr.root_path, qr.data_folder, 'really_short_adj_freq.csv'), index=False)
+
+    df = pd.read_csv(os.path.join(qr.root_path, qr.data_folder, 'really_short_adj_freq.csv'))
+    print(df)
+    safety_words = set(df['word'][df['is_it_safe'].isin(['1', '2'])])
+    print(safety_words)
+    print('safety words count:', len(safety_words))
+
+    query = """SELECT count (distinct property_id)
                 FROM review
-                WHERE short_adjs_for_neighbor IS NOT NULL
-                AND short_adjs_for_neighbor != 'false'
-                AND short_adjs_for_neighbor != ''
+                WHERE review.review_text LIKE ANY (values {})
                 ;
-                """
+                """.format(qr.format_keywords_for_search(list(safety_words)))
     qr.airbnb_cursor.execute(query)
     results = qr.airbnb_cursor.fetchall()
-    word_freq_dict = {}
-    for result in results:
-        for word in result[0].split(','):
-            word_freq_dict[word] = word_freq_dict.get(word, 0)+1
-    word_freq = [(key, value) for key, value in word_freq_dict.items()]
-    word_freq = sorted(word_freq, key=lambda item: item[1], reverse=True)
-    print(word_freq)
-    df = pd.DataFrame(columns=['word', 'freq'])
-    df['word'] = [word for word, _ in word_freq]
-    df['freq'] = [freq for _, freq in word_freq]
-    df['sentiment_category'] = -1
-    df.to_csv(os.path.join(qr.root_path, qr.data_folder, 'adj_freq.csv'), index=False)
+    print(results)
 
     """
     def find_adp(sentence):

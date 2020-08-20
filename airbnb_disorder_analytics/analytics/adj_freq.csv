@@ -3049,22 +3049,22 @@ get parts,9,-1
 really old,9,0
 quiet enough,9,1
 far away boston,9,-1
-year,9,???
+year,9,-1
 crowds,9,-1
 !right,9,-1
-great nice neighborhood,9,-1
+great nice neighborhood,9,1
 other shops,9,-1
 close cambridge,9,-1
 away bars,9,-1
 lodging,9,-1
-quick walk street,9,-1
+quick walk street,9,1
 great cambridge,9,-1
-little unsafe,9,-1
-us walk everywhere,9,-1
+little unsafe,9,2
+us walk everywhere,9,1
 opposite,9,-1
 close school,9,-1
 just short walk shops,9,-1
-truly excellent,9,-1
+truly excellent,9,1
 full gems,9,-1
 middle italy,9,-1
 pedestrian,9,-1
@@ -3079,7 +3079,7 @@ it was close downtown,9,-1
 quiet retreat,9,-1
 sleeping,9,-1
 movie,9,-1
-little messy,9,-1
+little messy,9,2
 hanging,9,-1
 very convenient travel,9,-1
 great seeing,9,-1
@@ -3093,12 +3093,12 @@ refrigerator,9,-1
 it easy get town,9,-1
 loop,9,-1
 away action,9,-1
-absolutely superb,9,-1
-quintessential austin,9,-1
+absolutely superb,9,1
+quintessential austin,9,1
 cenote,9,-1
-great touch,9,-1
+great touch,9,1
 quality,9,-1
-lovely homes,9,-1
+lovely homes,9,1
 say,9,-1
 !fault,9,-1
 great eateries,9,-1
@@ -3108,23 +3108,23 @@ stated,9,-1
 our activities,9,-1
 perfectly convenient,9,-1
 so close t,9,-1
-worthy,9,-1
+worthy,9,1
 easy get airport,9,-1
-amazing view,9,-1
+amazing view,9,1
 inexpensive,9,-1
-perfect very quiet,9,-1
+perfect very quiet,9,1
 hanover,9,-1
 take boston,9,-1
 rental,9,-1
 street common,9,-1
 close centre,9,-1
-safe lots,9,-1
-good neighbourhood,9,-1
+safe lots,9,1
+good neighbourhood,9,1
 very close congress,9,-1
 bank,9,-1
 street park,9,-1
 favorite,9,-1
-uncomfortable,9,-1
+uncomfortable,9,2
 very close highway,9,-1
 you prefer,9,-1
 very cold,9,-1
@@ -3152,13 +3152,13 @@ anytime,9,-1
 !restaurants,9,-1
 nice pool,9,-1
 easy commute,9,-1
-very nice quiet neighborhood,9,-1
+very nice quiet neighborhood,9,1
 option,9,-1
 only ride,9,-1
 it easy visit,9,-1
-super comfy,9,-1
+super comfy,9,1
 refreshing,9,-1
-nice surprise,9,-1
+nice surprise,9,1
 some spots,9,-1
 accessible everything,9,-1
 eat area,9,-1
@@ -3172,17 +3172,17 @@ i35,9,-1
 close some,9,-1
 great close town,9,-1
 head,9,-1
-amazing places,9,-1
+amazing places,9,1
 so close city,9,-1
 convenient spots,9,-1
-!unsafe,9,-1
+!unsafe,9,2
 it was close restaurants,9,-1
 you looking stay,9,-1
 setup,9,-1
 your coffee,9,-1
 !very walkable,9,-1
 close nightlife,9,-1
-extremely comfortable,9,-1
+extremely comfortable,9,1
 next restaurants,9,-1
 true experience,9,-1
 easily walkable restaurants,9,-1
@@ -3190,13 +3190,13 @@ easily accessible transportation,9,-1
 friend,9,-1
 drive congress,9,-1
 super convenient as well,9,-1
-it was quiet,9,-1
+it was quiet,9,1
 walking distance much,9,-1
 too far walk,9,-1
 about walk downtown,9,-1
 you take,9,-1
-very upscale,9,-1
-quite ideal,9,-1
+very upscale,9,1
+quite ideal,9,1
 our party,9,-1
 so close campus,9,-1
 short trip,9,-1
@@ -3208,20 +3208,20 @@ convenient food,9,-1
 convenient me,9,-1
 heart area,9,-1
 few nights,9,-1
-fantastic area,9,-1
+fantastic area,9,1
 far areas,9,-1
 best part stay,9,-1
 many spots,9,-1
-especially nice,9,-1
-very historic,9,-1
+especially nice,9,1
+very historic,9,1
 really close lot,9,-1
 quick drive austin,9,-1
 rapidly,9,-1
 spending,9,-1
-it perfect,9,-1
+it perfect,9,1
 arrival,9,-1
-dead quiet,9,-1
-!location,9,-1
+dead quiet,9,2
+!location,9,2
 shack,9,-1
 shops distance,9,-1
 perfect shopping,9,-1
@@ -3246,7 +3246,7 @@ getting city,9,-1
 wide,9,-1
 just minutes,9,-1
 i needed where be,9,-1
-fun place,9,-1
+fun place,9,1
 needing,9,-1
 crucial,9,-1
 back street,9,-1
@@ -3261,9 +3261,9 @@ all amenities,9,-1
 very convenient university,9,-1
 part city,9,-1
 short distance downtown,9,-1
-pretty quiet neighborhood,9,-1
-great relaxing,9,-1
-too loud,9,-1
+pretty quiet neighborhood,9,1
+great relaxing,9,1
+too loud,9,2
 comforts home,9,-1
 fantastic distance,9,-1
 my group,9,-1
@@ -3277,19 +3277,19 @@ smack middle,9,-1
 hot summer,9,-1
 away food,9,-1
 !those,9,-1
-beautifull,9,-1
+beautifull,9,1
 strip,9,-1
 c,9,-1
 cheap uber,9,-1
-relatively quiet street,9,-1
-great attractions,9,-1
+relatively quiet street,9,1
+great attractions,9,1
 nice parking,9,-1
-perfect street,9,-1
+perfect street,9,1
 close bus,9,-1
-!well,9,-1
+!well,9,2
 times day,9,-1
 so convenient downtown,9,-1
-seedy,9,-1
+seedy,9,2
 just short walk street,9,-1
 short walk stop,9,-1
 fairly central,9,-1
@@ -3297,18 +3297,18 @@ only thing,9,-1
 6th street street,9,-1
 its own,9,-1
 cool bars,9,-1
-so picturesque,9,-1
+so picturesque,9,1
 row,9,-1
 close supermarket,9,-1
 fantastic visit,9,-1
-extraordinary,9,-1
+extraordinary,9,1
 heart district,9,-1
 lot food,9,-1
 very close stops,9,-1
-fantastic places,9,-1
+fantastic places,9,1
 walking areas,9,-1
 close proximity areas,9,-1
-!that bad,9,-1
+!that bad,9,2
 !all,9,-1
 minutes train,9,-1
 quite small,9,-1
@@ -3320,13 +3320,13 @@ other things,9,-1
 perfect right,9,-1
 distance town,9,-1
 nh,9,-1
-cute quiet neighborhood,9,-1
+cute quiet neighborhood,9,1
 about walk square,9,-1
 1,9,-1
 km,9,-1
 m,9,-1
 great close t,9,-1
-very safe feeling,9,-1
+very safe feeling,9,1
 work building,9,-1
 distance university,9,-1
 short walk harvard,9,-1
@@ -3334,7 +3334,7 @@ little down,9,-1
 tour,9,-1
 close t.,9,-1
 easy get boston,9,-1
-worn,9,-1
+worn,9,2
 boston cambridge,9,-1
 sparse,9,-1
 sites boston,9,-1
@@ -3344,7 +3344,7 @@ little italy,9,-1
 worth exploring,9,-1
 arboretum,9,-1
 easy walk t,9,-1
-loud night,9,-1
+loud night,9,2
 middle end,9,-1
 nice shops,9,-1
 several units,9,-1
@@ -3352,24 +3352,24 @@ full students,9,-1
 stop line,9,-1
 center hill,9,-1
 great view city,9,-1
-beautiful street,9,-1
+beautiful street,9,1
 conversation,9,-1
-spectacular views,9,-1
+spectacular views,9,1
 you using,9,-1
-lovely residential area,9,-1
-very safe location,9,-1
-beautiful hills,9,-1
+lovely residential area,9,1
+very safe location,9,1
+beautiful hills,9,1
 first rate,8,-1
 distance bunch,8,-1
 walkable square,8,-1
-lovely park,8,-1
-chic,8,-1
+lovely park,8,1
+chic,8,1
 late evening,8,-1
 pictured,8,-1
 very convenient stores,8,-1
 reasons,8,-1
 walk metro,8,-1
-!fantastic,8,-1
+!fantastic,8,2
 entire time,8,-1
 cake,8,-1
 bit area,8,-1
@@ -3377,29 +3377,29 @@ beat,8,-1
 lots stores,8,-1
 top floor,8,-1
 delicious restaurants,8,-1
-great quiet street,8,-1
+great quiet street,8,1
 excellent walk,8,-1
 access restaurants,8,-1
 !again,8,-1
 fall,8,-1
-kind of loud,8,-1
+kind of loud,8,2
 convenient campus,8,-1
-quiet location,8,-1
+quiet location,8,1
 lobby,8,-1
 very short walk station,8,-1
-fabulous-,8,-1
+fabulous-,8,1
 !that,8,-1
 bill,8,-1
 very convenient activities,8,-1
 correct,8,-1
 great adventures,8,-1
-simply beautiful,8,-1
-unbelievably convenient,8,-1
+simply beautiful,8,1
+unbelievably convenient,8,1
 massachusetts,8,-1
 !any more convenient,8,-1
 their music,8,-1
 minutes stop,8,-1
-really sweet,8,-1
+really sweet,8,1
 !new,8,-1
 about minute,8,-1
 very responsive host,8,-1
@@ -3411,8 +3411,8 @@ amazing access,8,-1
 broadway,8,-1
 perfect size,8,-1
 safe me,8,-1
-quite residential,8,-1
-nice safe neighborhood,8,-1
+quite residential,8,1
+nice safe neighborhood,8,1
 good deal,8,-1
 away train,8,-1
 !very convenient,8,-1
@@ -3432,7 +3432,7 @@ bit nuisance,8,-1
 blocks area,8,-1
 you are interested,8,-1
 exactly pictured,8,-1
-incredibly beautiful,8,-1
+incredibly beautiful,8,1
 short walk center,8,-1
 away common,8,-1
 away all,8,-1
@@ -3449,7 +3449,7 @@ suburban feel,8,-1
 very open,8,-1
 good point,8,-1
 compact,8,-1
-quiet street distance,8,-1
+quiet street distance,8,1
 !space,8,-1
 i,8,-1
 yoga,8,-1
@@ -3458,22 +3458,22 @@ anywhere else,8,-1
 extremely welcoming,8,-1
 dead end,8,-1
 well furnished,8,-1
-authentic,8,-1
+authentic,8,1
 highly recommend,8,-1
 exactly advertised,8,-1
 forward,8,-1
 start,8,-1
 medford,8,-1
 nice part town,8,-1
-historical,8,-1
-quite new,8,-1
-old buildings,8,-1
+historical,8,1
+quite new,8,1
+old buildings,8,2
 arlington,8,-1
 busy area,8,-1
 it is street,8,-1
 so much character,8,-1
 short walk t.,8,-1
-divine,8,-1
+divine,8,1
 residence,8,-1
 revitalization,8,-1
 !far away,8,-1
@@ -3486,7 +3486,7 @@ wave,8,-1
 escape,8,-1
 good austin,8,-1
 conversations,8,-1
-quite cute,8,-1
+quite cute,8,1
 very expensive,8,-1
 hospital,8,-1
 cool restaurants,8,-1
@@ -3495,16 +3495,16 @@ sounds,8,-1
 long day sightseeing,8,-1
 unfortunately,8,-1
 we wanted exactly where be,8,-1
-pretty neighborhood,8,-1
+pretty neighborhood,8,1
 hit,8,-1
-older homes,8,-1
+older homes,8,2
 confusing,8,-1
 facility,8,-1
 roof,8,-1
 easy access station,8,-1
 central attractions,8,-1
-fantastic street,8,-1
-bumpy,8,-1
+fantastic street,8,1
+bumpy,8,2
 netflix,8,-1
 pretty much perfect,8,-1
 great addition,8,-1
@@ -3537,14 +3537,14 @@ great hang,8,-1
 comfortable stay,8,-1
 any,8,-1
 appliances,8,-1
-awesome neighborhood,8,-1
+awesome neighborhood,8,1
 especially you like,8,-1
 close variety,8,-1
 great drive,8,-1
-absolutely incredible,8,-1
+absolutely incredible,8,1
 nice access,8,-1
 it is close downtown,8,-1
-really terrific,8,-1
+really terrific,8,1
 close enough walk street,8,-1
 cleaned,8,-1
 best location,8,-1
@@ -3552,14 +3552,14 @@ equally,8,-1
 parents,8,-1
 perfect close downtown,8,-1
 highly recommended,8,-1
-!upscale,8,-1
+!upscale,8,2
 distance destinations,8,-1
 great very close campus,8,-1
 private bathroom,8,-1
 boat,8,-1
 our itinerary,8,-1
 walking distance store,8,-1
-super quaint,8,-1
+super quaint,8,1
 very easy work,8,-1
 convenient stop,8,-1
 you want do,8,-1
@@ -3568,12 +3568,12 @@ center downtown,8,-1
 maintenance,8,-1
 close roads,8,-1
 great min,8,-1
-perfect location trip,8,-1
+perfect location trip,8,1
 great pool,8,-1
 available use,8,-1
 !home,8,-1
-trendy area,8,-1
-!better place,8,-1
+trendy area,8,1
+!better place,8,1
 office,8,-1
 very family,8,-1
 very comfortable bed,8,-1
@@ -3583,7 +3583,7 @@ great close shops,8,-1
 playing,8,-1
 it perfect place,8,-1
 close options,8,-1
-really cozy,8,-1
+really cozy,8,1
 !nicer,8,-1
 reading,8,-1
 up area austin,8,-1
@@ -3602,7 +3602,7 @@ convenient trip,8,-1
 convenient proximity,8,-1
 it located,8,-1
 ideal walk,8,-1
-!amazing,8,-1
+!amazing,8,2
 sites austin,8,-1
 !far austin,8,-1
 our purpose,8,-1
@@ -3613,29 +3613,29 @@ lots charm,8,-1
 you explore,8,-1
 very close stores,8,-1
 good amenities,8,-1
-excellent plenty,8,-1
+excellent plenty,8,1
 lot construction,8,-1
 lots stuff,8,-1
 !too busy,8,-1
-very good neighborhood,8,-1
+very good neighborhood,8,1
 us visit,8,-1
 great walk around,8,-1
 season,8,-1
 high,8,-1
 close trails,8,-1
 close enough anything,8,-1
-nice quiet residential area,8,-1
-great residential area,8,-1
+nice quiet residential area,8,1
+great residential area,8,1
 their location,8,-1
 roosters,8,-1
 safe shops,8,-1
 one spots,8,-1
-safe place,8,-1
+safe place,8,1
 away spots,8,-1
 !great too far downtown,8,-1
 10min,8,-1
 distance river,8,-1
-very safe walk around night,8,-1
+very safe walk around night,8,1
 right outside,8,-1
 suite,8,-1
 you got,8,-1
@@ -3646,13 +3646,13 @@ far everything,8,-1
 cute area,8,-1
 rural area,8,-1
 walking distance bunch,8,-1
-ideal austin,8,-1
+ideal austin,8,1
 very nice lots,8,-1
-amazing amenities,8,-1
+amazing amenities,8,1
 very convenient congress,8,-1
 you see,8,-1
 convenient parking,8,-1
-pretty dark,8,-1
+pretty dark,8,1
 fresh,8,-1
 super good,8,-1
 million,8,-1
@@ -3668,12 +3668,12 @@ be location,8,-1
 sofa,8,-1
 easy get places,8,-1
 very walkable lots,8,-1
-very loud music,8,-1
+very loud music,8,2
 perfect very close everything,8,-1
 6th bars,8,-1
 visitor,8,-1
-nice residential neighborhood,8,-1
-pretty sketchy,8,-1
+nice residential neighborhood,8,1
+pretty sketchy,8,1
 close grocery,8,-1
 top list,8,-1
 great visitors,8,-1
@@ -3684,9 +3684,9 @@ our getaway,8,-1
 very,8,-1
 about walk area,8,-1
 close proximity places,8,-1
-so inviting,8,-1
+so inviting,8,1
 all attractions,8,-1
-so quite,8,-1
+so quite,8,1
 ubering,8,-1
 conditioning,8,-1
 it easy find,8,-1
@@ -3695,14 +3695,14 @@ wrong,8,-1
 matches,8,-1
 extra bonus,8,-1
 jogging,8,-1
-somewhat sketchy,8,-1
+somewhat sketchy,8,2
 close proximity downtown,8,-1
 vehicle,8,-1
 top hill,8,-1
 neighborhoods austin,8,-1
 very much appreciated,8,-1
 prior,8,-1
-quiet sleep,8,-1
+quiet sleep,8,1
 very thoughtful,8,-1
 middle city,8,-1
 interested,8,-1
@@ -3715,7 +3715,7 @@ imaginable,8,-1
 appartment,8,-1
 !too far area,8,-1
 !enough,8,-1
-absolutely brilliant,8,-1
+absolutely brilliant,8,1
 quick access highways,8,-1
 good needs,8,-1
 many options food,8,-1
@@ -3724,7 +3724,7 @@ once,8,-1
 functional,8,-1
 even better we expected,8,-1
 juan,8,-1
-great--,8,-1
+great--,8,1
 daytime,8,-1
 visit area,8,-1
 !right heart,8,-1
@@ -3743,20 +3743,20 @@ lot time,8,-1
 i visiting,8,-1
 close road,8,-1
 very close transport,8,-1
-!dangerous,8,-1
+!dangerous,8,2
 hallways,8,-1
 blocks line,8,-1
 minutes beach,8,-1
-historic area,8,-1
+historic area,8,1
 walking around,8,-1
 trips boston,8,-1
 major attractions,8,-1
 adults,8,-1
 walking distance beach,8,-1
 woman,8,-1
-very busy road,8,-1
+very busy road,8,2
 mentioned,8,-1
-very cute neighborhood,8,-1
+very cute neighborhood,8,1
 firepit,8,-1
 far station,8,-1
 their home,8,-1
@@ -3779,7 +3779,7 @@ convenient conference,8,-1
 well connected,8,-1
 unh,8,-1
 middle street,8,-1
-great very safe,8,-1
+great very safe,8,1
 nice park,8,-1
 stop away,8,-1
 best part apartment,8,-1
@@ -3788,16 +3788,16 @@ whole house,8,-1
 great close harvard,8,-1
 lined streets,8,-1
 next area,8,-1
-ideal street,8,-1
+ideal street,8,1
 very urban,8,-1
 street cemetery,8,-1
 store away,8,-1
 you want use,8,-1
-!very well,8,-1
+!very well,8,2
 close proximity transportation,8,-1
 blocks beach,8,-1
-fairly old,8,-1
-pretty narrow,7,-1
+fairly old,8,2
+pretty narrow,7,2
 it was street,7,-1
 talking,7,-1
 !always,7,-1
@@ -3808,12 +3808,12 @@ ac,7,-1
 large area,7,-1
 even better i expected,7,-1
 minutes house,7,-1
-incredibly noisy,7,-1
+incredibly noisy,7,2
 destination,7,-1
 quietly,7,-1
 you want experience,7,-1
 just okay,7,-1
-!anymore perfect,7,-1
+!anymore perfect,7,1
 look,7,-1
 next lot,7,-1
 right next train,7,-1
@@ -3823,13 +3823,13 @@ close venue,7,-1
 sublime,7,-1
 right harvard,7,-1
 ma,7,-1
-perfect beautiful neighborhood,7,-1
+perfect beautiful neighborhood,7,1
 great walk restaurants,7,-1
 better we expected,7,-1
 !actually,7,-1
 !it is,7,-1
 good things,7,-1
-convenient roads,7,-1
+convenient roads,7,2
 pain,7,-1
 block center,7,-1
 !there is,7,-1
@@ -3842,14 +3842,14 @@ many sights,7,-1
 futon,7,-1
 available parking,7,-1
 issue sleepers,7,-1
-pretty clean,7,-1
+pretty clean,7,1
 rich history,7,-1
 sunday,7,-1
 most everything,7,-1
 really interesting,7,-1
-quiet clean,7,-1
+quiet clean,7,1
 great little restaurants,7,-1
-neighborhood is quiet,7,-1
+neighborhood is quiet,7,1
 nice one,7,-1
 next tracks,7,-1
 so easy get,7,-1
@@ -3861,7 +3861,7 @@ tough,7,-1
 whole foods,7,-1
 really nice lots,7,-1
 harbour,7,-1
-!particularly safe,7,-1
+!particularly safe,7,2
 reviews,7,-1
 only walk square,7,-1
 just as nice,7,-1
@@ -3884,7 +3884,7 @@ lots spots,7,-1
 ideal anything,7,-1
 management,7,-1
 lovely lots,7,-1
-great close street,7,-1
+great close street,7,1
 convenient bars,7,-1
 close access,7,-1
 !terms access,7,-1
@@ -3895,9 +3895,9 @@ traveler,7,-1
 easy drive area,7,-1
 present,7,-1
 texas,7,-1
-!well lit night,7,-1
-quiet road,7,-1
-!quiet neighborhood,7,-1
+!well lit night,7,2
+quiet road,7,1
+!quiet neighborhood,7,2
 close proximity stores,7,-1
 you looking be,7,-1
 we were able walk everywhere,7,-1
@@ -3918,32 +3918,32 @@ perfect stay,7,-1
 great supermarket,7,-1
 super close station,7,-1
 very quick respond questions,7,-1
-it ideal,7,-1
+it ideal,7,1
 tlc,7,-1
 company,7,-1
-untidy,7,-1
+untidy,7,2
 great very convenient,7,-1
 very responsive questions,7,-1
 walking distance cafes,7,-1
 walking distance train,7,-1
 !our needs,7,-1
 !as well,7,-1
-accommodating,7,-1
+accommodating,7,1
 field,7,-1
 very nice park,7,-1
-quiet shops,7,-1
-rather noisy,7,-1
-really nice restaurants,7,-1
+quiet shops,7,1
+rather noisy,7,2
+really nice restaurants,7,1
 !accurate,7,-1
 good base,7,-1
-noises,7,-1
+noises,7,2
 store nearby,7,-1
 super convenient line,7,-1
 close district,7,-1
 bird,7,-1
 walking bars,7,-1
 !complaints,7,-1
-quiet sac,7,-1
+quiet sac,7,1
 it very easy get areas,7,-1
 riverside,7,-1
 lane,7,-1
@@ -3951,16 +3951,16 @@ block house,7,-1
 walk fenway,7,-1
 just short walk beach,7,-1
 post,7,-1
-desirable,7,-1
+desirable,7,1
 walk house,7,-1
-very convienient,7,-1
+very convienient,7,1
 call,7,-1
-sketchy neighborhood,7,-1
+sketchy neighborhood,7,2
 !around,7,-1
 one things,7,-1
-!very well lit,7,-1
+!very well lit,7,2
 strategic,7,-1
-so prime,7,-1
+so prime,7,1
 which,7,-1
 perfect very close station,7,-1
 usually,7,-1
@@ -3977,7 +3977,7 @@ quick respond questions,7,-1
 air,7,-1
 outside area,7,-1
 my girlfriend,7,-1
-super convenient austin,7,-1
+super convenient austin,7,1
 so central everything,7,-1
 very short drive downtown,7,-1
 two,7,-1
@@ -4004,7 +4004,7 @@ blocks center,7,-1
 wonderful time,7,-1
 kinda,7,-1
 this was,7,-1
-amazing place,7,-1
+amazing place,7,1
 perfect work,7,-1
 us have,7,-1
 so many things,7,-1
@@ -4049,18 +4049,18 @@ be transition,7,-1
 quiet getaway,7,-1
 super close austin,7,-1
 lot areas,7,-1
-too noisy,7,-1
+too noisy,7,2
 accessible all,7,-1
-!very quiet,7,-1
+!very quiet,7,2
 one favorite,7,-1
 !too far anything,7,-1
 our trip austin,7,-1
 fantastic food,7,-1
-so awesome,7,-1
+so awesome,7,1
 perfect swimming,7,-1
 heart street,7,-1
 perk,7,-1
-awesome view,7,-1
+awesome view,7,1
 great close transportation,7,-1
 walking distance number,7,-1
 special,7,-1
@@ -4075,12 +4075,12 @@ easier,7,-1
 close fun,7,-1
 acceptable,7,-1
 drive spots,7,-1
-quite perfect,7,-1
+quite perfect,7,1
 surrounding,7,-1
 hostess,7,-1
 big trees,7,-1
 chilly,7,-1
-noisey,7,-1
+noisey,7,2
 right next area,7,-1
 mopac,7,-1
 beautiful scenery,7,-1
@@ -4095,15 +4095,15 @@ my short stay,7,-1
 enjoying,7,-1
 close proximity austin,7,-1
 art,7,-1
-beautiful residential neighborhood,7,-1
+beautiful residential neighborhood,7,1
 couches,7,-1
 just walk downtown,7,-1
 joint,7,-1
 delicious food,7,-1
-authentic experience,7,-1
+authentic experience,7,1
 drives,7,-1
 first class,7,-1
-perfect quiet neighborhood,7,-1
+perfect quiet neighborhood,7,1
 great trucks,7,-1
 be ago,7,-1
 conveniently close restaurants,7,-1
@@ -4114,7 +4114,7 @@ much nicer,7,-1
 quick ride airport,7,-1
 midway,7,-1
 spring,7,-1
-so fantastic,7,-1
+so fantastic,7,1
 !better access,7,-1
 one worst,7,-1
 right next campus,7,-1
@@ -4161,8 +4161,8 @@ full options,7,-1
 conferences,7,-1
 perfect me,7,-1
 perfect dining,7,-1
-quite dark,7,-1
-very good area,7,-1
+quite dark,7,2
+very good area,7,1
 we were able walk,7,-1
 very convenient visit,7,-1
 walking distances,7,-1
@@ -4172,7 +4172,7 @@ extremely convenient restaurants,7,-1
 easy access street,7,-1
 self,7,-1
 beautiful restaurants,7,-1
-nice quiet,7,-1
+nice quiet,7,1
 several amenities,7,-1
 very important,7,-1
 great gym,7,-1
@@ -4197,7 +4197,7 @@ close proximity interstate,7,-1
 quick trip austin,7,-1
 you want take,7,-1
 mattress,7,-1
-true gem,7,-1
+true gem,7,1
 regardless,7,-1
 great restaurant,7,-1
 gate,7,-1
@@ -4209,7 +4209,7 @@ saturday,7,-1
 different areas,7,-1
 short,7,-1
 washer,7,-1
-pretty lively,7,-1
+pretty lively,7,1
 !my opinion,7,-1
 e.g.,7,-1
 just east downtown,7,-1
@@ -4217,14 +4217,14 @@ quite busy,7,-1
 short walk everything,7,-1
 right off,7,-1
 w,7,-1
-very tidy,7,-1
-really unbeatable,7,-1
+very tidy,7,1
+really unbeatable,7,1
 checkin,7,-1
 early hours,7,-1
 quite well,7,-1
 period,7,-1
 whole area,7,-1
-cutest neighborhood,7,-1
+cutest neighborhood,7,1
 !it was,7,-1
 you love,7,-1
 good coffee,7,-1
@@ -4235,7 +4235,7 @@ touring,7,-1
 seconds,7,-1
 basic,7,-1
 closer downtown,7,-1
-slightly sketchy,7,-1
+slightly sketchy,7,2
 feet,7,-1
 flowers,7,-1
 more commercial area,7,-1
@@ -4244,12 +4244,12 @@ newton,7,-1
 burnet,7,-1
 depending,7,-1
 great eats,7,-1
-!very good,7,-1
+!very good,7,2
 very roomy,7,-1
 3rd floor,7,-1
 minutes t,7,-1
 long day city,7,-1
-cozy neighborhood,7,-1
+cozy neighborhood,7,1
 short drive boston,7,-1
 old downtown,7,-1
 anticipated,7,-1
@@ -4261,7 +4261,7 @@ close proximity beach,7,-1
 neighborhood homes,7,-1
 many destinations,7,-1
 !windows,7,-1
-quite lively,7,-1
+quite lively,7,1
 short ride boston,7,-1
 indoors,7,-1
 convenient portsmouth,7,-1
@@ -4302,7 +4302,7 @@ just short walk restaurants,7,-1
 easy walk subway,7,-1
 so close station,7,-1
 roslindale,7,-1
-!any more perfect,7,-1
+!any more perfect,7,1
 copley,7,-1
 quite clean,7,-1
 great transport,7,-1
@@ -4311,7 +4311,7 @@ distance train,7,-1
 superb street,7,-1
 very short walk restaurants,7,-1
 quick access airport,7,-1
-!best neighborhood,7,-1
+!best neighborhood,7,2
 super convenient boston,7,-1
 really close transportation,7,-1
 !my stay,7,-1
@@ -4347,13 +4347,13 @@ albeit,7,-1
 further afield,7,-1
 quiet street parking,7,-1
 95,6,-1
-great streets,6,-1
-awful,6,-1
-!more beautiful,6,-1
-a+++,6,-1
+great streets,6,1
+awful,6,2
+!more beautiful,6,1
+a+++,6,1
 drive salem,6,-1
-pretty secluded,6,-1
-invaluable,6,-1
+pretty secluded,6,1
+invaluable,6,1
 ticket,6,-1
 !conditioning,6,-1
 close common,6,-1
@@ -4366,12 +4366,12 @@ necessary,6,-1
 snow,6,-1
 very busy street,6,-1
 distance house,6,-1
-gorgeous homes,6,-1
+gorgeous homes,6,1
 right next river,6,-1
-great variety,6,-1
+great variety,6,1
 easy walk train,6,-1
 weed,6,-1
-kind of noisy,6,-1
+kind of noisy,6,2
 inman,6,-1
 very well situated,6,-1
 very convenient metro,6,-1
@@ -4397,13 +4397,13 @@ accessible attractions,6,-1
 nice quite,6,-1
 great selection restaurants,6,-1
 birds,6,-1
-very cute lots,6,-1
+very cute lots,6,1
 real highlight,6,-1
 strongly,6,-1
-excellent area,6,-1
+excellent area,6,1
 away some,6,-1
 short walk transit,6,-1
-fantastic lots,6,-1
+fantastic lots,6,1
 !so,6,-1
 utensils,6,-1
 phone,6,-1
@@ -4412,7 +4412,7 @@ plenty paths,6,-1
 super close center,6,-1
 !spot,6,-1
 wonderfully,6,-1
-pretty fantastic,6,-1
+pretty fantastic,6,1
 accessibility,6,-1
 what makes,6,-1
 u,6,-1
@@ -4428,7 +4428,7 @@ ones,6,-1
 very very convenient,6,-1
 fans,6,-1
 just short walk area,6,-1
-awesome place,6,-1
+awesome place,6,1
 you paying,6,-1
 one boston,6,-1
 just about perfect,6,-1
@@ -4446,7 +4446,7 @@ crossing,6,-1
 too far,6,-1
 minimal,6,-1
 little seedy,6,-1
-very quiet suburban neighborhood,6,-1
+very quiet suburban neighborhood,6,1
 spotty,6,-1
 plenty restaurants nearby,6,-1
 right next restaurants,6,-1
@@ -4459,7 +4459,7 @@ too busy kids walk safely,6,-1
 adventure,6,-1
 ideal drive,6,-1
 details,6,-1
-beautiful neighbors,6,-1
+beautiful neighbors,6,1
 quick trip downtown,6,-1
 our rental car,6,-1
 convient,6,-1
@@ -4467,11 +4467,11 @@ mins airport,6,-1
 student,6,-1
 shopping congress,6,-1
 large groups,6,-1
-perfect super close everything,6,-1
+perfect super close everything,6,1
 lots fun,6,-1
 ideal sxsw,6,-1
 your dog,6,-1
-nice safe area,6,-1
+nice safe area,6,1
 !drive,6,-1
 very convenient town,6,-1
 perfect that,6,-1
@@ -4481,7 +4481,7 @@ really convenient restaurants,6,-1
 short walks,6,-1
 tracks,6,-1
 nice lots places,6,-1
-quiet street area,6,-1
+quiet street area,6,1
 access anything,6,-1
 easy access freeway,6,-1
 quiet space,6,-1
@@ -4494,7 +4494,7 @@ very chic,6,-1
 surrounding neighborhood,6,-1
 horses,6,-1
 updates,6,-1
-extremely secure,6,-1
+extremely secure,6,1
 so close things,6,-1
 historic boston,6,-1
 occasion,6,-1
@@ -4506,7 +4506,7 @@ quick trips,6,-1
 away t.,6,-1
 trip area,6,-1
 very easy get around,6,-1
-walk night,6,-1
+walk night,6,1
 very convenient walk,6,-1
 up coming area,6,-1
 relatively new,6,-1
@@ -4526,11 +4526,11 @@ right water,6,-1
 his neighborhood,6,-1
 great help,6,-1
 acres,6,-1
-very authentic,6,-1
+very authentic,6,1
 brewery,6,-1
 dollars,6,-1
 snack,6,-1
-!very attractive,6,-1
+!very attractive,6,2
 loads,6,-1
 ideal group,6,-1
 various restaurants,6,-1
@@ -4543,48 +4543,48 @@ accessible lot,6,-1
 businesses,6,-1
 !parties,6,-1
 minutes bus,6,-1
-really noisy,6,-1
-exceptionally quiet,6,-1
-trash,6,-1
+really noisy,6,2
+exceptionally quiet,6,1
+trash,6,2
 be close everything,6,-1
 rest house,6,-1
 nice have,6,-1
-remarkable,6,-1
+remarkable,6,1
 tons stuff,6,-1
 many bars,6,-1
-somewhat noisy,6,-1
+somewhat noisy,6,2
 across park,6,-1
-fairly quiet neighborhood,6,-1
+fairly quiet neighborhood,6,2
 same block,6,-1
-near perfect,6,-1
+near perfect,6,1
 removed,6,-1
 tables,6,-1
 it easy get parts,6,-1
 15,6,-1
-safe night,6,-1
-truly beautiful,6,-1
+safe night,6,1
+truly beautiful,6,1
 quite large,6,-1
-little rowdy,6,-1
+little rowdy,6,2
 close enough downtown walk,6,-1
 access all,6,-1
 anything downtown,6,-1
-quiet peaceful,6,-1
-me feel safe,6,-1
+quiet peaceful,6,1
+me feel safe,6,1
 great restaurants bars,6,-1
 great wedding,6,-1
-!super nice,6,-1
+!super nice,6,2
 staying there,6,-1
 shops congress,6,-1
-perfect walk around,6,-1
-beautiful space,6,-1
+perfect walk around,6,1
+beautiful space,6,1
 we were austin,6,-1
 ideal plans,6,-1
 only downtown,6,-1
 proximity street,6,-1
 capital,6,-1
-fairly safe,6,-1
-clean place,6,-1
-us feel very safe,6,-1
+fairly safe,6,2
+clean place,6,2
+us feel very safe,6,1
 super convenient restaurants,6,-1
 !ton,6,-1
 good visit,6,-1
@@ -4602,7 +4602,7 @@ close heart,6,-1
 lighting,6,-1
 us enjoy,6,-1
 tarrytown,6,-1
-!anything special,6,-1
+!anything special,6,2
 easy access trails,6,-1
 wonderful experience,6,-1
 very convenient things,6,-1
@@ -4632,7 +4632,7 @@ great get,6,-1
 hammock,6,-1
 ton things,6,-1
 actually perfect,6,-1
-wonderful quiet,6,-1
+wonderful quiet,6,1
 lot stores,6,-1
 plenty eateries,6,-1
 still being area,6,-1
@@ -4647,12 +4647,12 @@ respite,6,-1
 about ride street,6,-1
 distance strip,6,-1
 kayaks,6,-1
-truly great,6,-1
+truly great,6,1
 curtains,6,-1
-nice safe,6,-1
+nice safe,6,1
 walk in,6,-1
 easily accessible area,6,-1
-awsome,6,-1
+awsome,6,1
 daily basis,6,-1
 we wanted where be,6,-1
 so many great places distance,6,-1
@@ -4662,7 +4662,7 @@ our first time austin,6,-1
 close drive places,6,-1
 i expecting,6,-1
 great easy get,6,-1
-little dicey,6,-1
+little dicey,6,2
 quiet enough sleep,6,-1
 very close food,6,-1
 distance all,6,-1
@@ -4670,7 +4670,7 @@ get anywhere austin,6,-1
 that is,6,-1
 relatively close downtown,6,-1
 great parks,6,-1
-perfect spots,6,-1
+perfect spots,6,1
 adventures,6,-1
 close i35,6,-1
 one reasons,6,-1
@@ -4681,11 +4681,11 @@ convenient locations,6,-1
 austin tx,6,-1
 easy access freeways,6,-1
 really spacious,6,-1
-spotlessly clean,6,-1
+spotlessly clean,6,1
 nice feel,6,-1
 it provided,6,-1
 many nice restaurants,6,-1
-nice little neighborhood,6,-1
+nice little neighborhood,6,1
 concern,6,-1
 close number,6,-1
 nice plus,6,-1
@@ -4708,13 +4708,13 @@ great cafe,6,-1
 close work,6,-1
 bit distance,6,-1
 fancy,6,-1
-small neighborhood,6,-1
+small neighborhood,6,2
 beautiful building,6,-1
 next house,6,-1
 5min,6,-1
 very close trail,6,-1
 lot stuff,6,-1
-nice quiet residential neighborhood,6,-1
+nice quiet residential neighborhood,6,1
 great dining,6,-1
 towns,6,-1
 amenity,6,-1
@@ -4727,7 +4727,7 @@ late hours night,6,-1
 many sites city,6,-1
 middle everywhere,6,-1
 near downtown,6,-1
-fantastically,6,-1
+fantastically,6,1
 !far places,6,-1
 only couple blocks,6,-1
 great close park,6,-1
@@ -4736,12 +4736,12 @@ their neighborhood,6,-1
 close shop,6,-1
 fantastic stay,6,-1
 really dark,6,-1
-quiet community,6,-1
+quiet community,6,1
 main streets,6,-1
 main floor,6,-1
-peace neighborhood,6,-1
+peace neighborhood,6,1
 most austin,6,-1
-calm area,6,-1
+calm area,6,1
 communicative,6,-1
 super convenient access,6,-1
 only short walk away,6,-1
@@ -4777,7 +4777,7 @@ very easy navigate,6,-1
 further out,6,-1
 walk congress,6,-1
 !access,6,-1
-!best area,6,-1
+!best area,6,2
 great walking distance lots,6,-1
 it 's distance,6,-1
 easy walk lots,6,-1
@@ -4790,22 +4790,22 @@ interesting place,6,-1
 readily available,6,-1
 !too much,6,-1
 pretty close lot,6,-1
-great beautiful neighborhood,6,-1
+great beautiful neighborhood,6,1
 drink area,6,-1
 steps restaurants,6,-1
-perfect location austin,6,-1
+perfect location austin,6,1
 our conference,6,-1
 pretty suburban,6,-1
 so close park,6,-1
 very convenient food,6,-1
-real gem,6,-1
-perfect being,6,-1
-perfect this,6,-1
+real gem,6,1
+perfect being,6,1
+perfect this,6,1
 ideal trips,6,-1
 hospitable,6,-1
-so nice walk around,6,-1
+so nice walk around,6,1
 my room,6,-1
-extremely cute,6,-1
+extremely cute,6,1
 great vacation,6,-1
 good eats,6,-1
 which is we looking,6,-1
@@ -4853,30 +4853,30 @@ festivities,6,-1
 beautiful tree,6,-1
 great center,6,-1
 close enough boston,6,-1
-gentrified,6,-1
+gentrified,6,2
 typical neighborhood,6,-1
 you need be,6,-1
 too far area,6,-1
 ideal experience,6,-1
 huge help,6,-1
 very convenient visitors,6,-1
-simply fantastic,6,-1
-super sweet,6,-1
+simply fantastic,6,1
+super sweet,6,1
 some bars,6,-1
 almost anything,6,-1
 one aspects,6,-1
 cats,6,-1
 updated,6,-1
 day night,6,-1
-really busy,6,-1
-peaceful area,6,-1
+really busy,6,2
+peaceful area,6,1
 wonderful access,6,-1
 pretty much everything,6,-1
 concerning,6,-1
 temp,6,-1
 only walk shops,6,-1
-historic neighborhood,6,-1
-prime places,6,-1
+historic neighborhood,6,1
+prime places,6,1
 same address,6,-1
 even,6,-1
 cream,6,-1
@@ -4891,13 +4891,13 @@ restroom,6,-1
 plenty spaces,6,-1
 quick ride neighborhoods,6,-1
 great very close street,6,-1
-super chill,6,-1
-!that safe,6,-1
+super chill,6,1
+!that safe,6,2
 shown,6,-1
 lot restaurants nearby,6,-1
 our area,6,-1
 great value money,6,-1
-!so nice,6,-1
+!so nice,6,2
 it great value,6,-1
 heart one,6,-1
 it easy us get around,6,-1
@@ -4911,24 +4911,24 @@ excellent lots,6,-1
 even there is,6,-1
 lot activities,6,-1
 excellent place,6,-1
-quiet neighborhood close everything,6,-1
+quiet neighborhood close everything,6,1
 many different places,6,-1
 just that,6,-1
 20min,6,-1
 close conference,6,-1
 sunshine,6,-1
-little gritty,6,-1
+little gritty,6,2
 it perfect location,6,-1
 somewhat rundown,6,-1
-amazing location,6,-1
+amazing location,6,1
 get all,6,-1
 example,6,-1
 very simple,6,-1
 pretty solid,6,-1
-pefect,6,-1
-plenty cool,6,-1
+pefect,6,1
+plenty cool,6,1
 worth checking,6,-1
-quiet part,6,-1
+quiet part,6,1
 nondescript,6,-1
 really close city,6,-1
 far places,6,-1
@@ -4937,7 +4937,7 @@ central most,6,-1
 away lot,6,-1
 about as good it gets,6,-1
 beaten track,6,-1
-terrific access,6,-1
+terrific access,6,1
 edge chinatown,6,-1
 dishes,6,-1
 pretty good location,6,-1
@@ -4951,29 +4951,29 @@ close daughter,6,-1
 other areas city,6,-1
 great less,6,-1
 ideal tourists,6,-1
-best place,6,-1
+best place,6,1
 block stop,6,-1
 my dogs,6,-1
-amazing-,6,-1
+amazing-,6,1
 team,6,-1
 shops nearby,6,-1
-very nice place,6,-1
-quiet street access,6,-1
+very nice place,6,1
+quiet street access,6,1
 couple restaurants,6,-1
 particularly great,6,-1
-really walkable,6,-1
-fun vibe,6,-1
+really walkable,6,1
+fun vibe,6,1
 great local restaurants,6,-1
-just terrific,6,-1
-narrow streets,6,-1
+just terrific,6,1
+narrow streets,6,2
 it easy reach,6,-1
 just short walk square,6,-1
 residential neighbourhood,6,-1
 us feel welcome,6,-1
 very convenient trip,6,-1
 other tenants,6,-1
-perfect right heart,6,-1
-ideal cambridge,6,-1
+perfect right heart,6,1
+ideal cambridge,6,1
 perfect visitors,6,-1
 !described,6,-1
 close st,6,-1
@@ -4983,14 +4983,14 @@ boston has offer,6,-1
 lots students,6,-1
 job,6,-1
 safe walk night,6,-1
-perfect it,6,-1
+perfect it,6,1
 minutes walk square,6,-1
 proximity boston,6,-1
 back area,6,-1
 so many places downtown,6,-1
-wonderful area,6,-1
+wonderful area,6,1
 bcec,6,-1
-traveling boston,6,-1
+traveling boston,6,???
 it is close airport,6,-1
 positives,6,-1
 really handy,6,-1
