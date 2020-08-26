@@ -25,6 +25,8 @@ import psycopg2
 import pandas as pd
 import os
 from tqdm import tqdm
+import sys
+import math
 
 # connect to database
 connection = psycopg2.connect(DBInfo.airbnb_config)
@@ -122,30 +124,60 @@ def set_null_values_in_daily_booking(null_value='1990-01-01'):
     connection.commit()
     return True
 
+def add_airbnb_property_id_in_property(df):
+    for index, row in df.iterrows():
+        property_id = row['Property ID']
+        if math.isnan(row['Airbnb Property ID']):
+            continue
+        else:
+            airbnb_id = int(row['Airbnb Property ID'])
+        query = """UPDATE property
+                    SET airbnb_property_id = %s
+                    WHERE property_id = %s;"""
+        cursor.execute(query, (airbnb_id, property_id))
+    connection.commit()
 
-region_list = ['austin-round-rock-tx',
-               'boston-cambridge-newton-ma-nh',
-               'chicago-naperville-elgin-il-in-wi',
-               'los-angeles-long-beach-anaheim-ca',
-               'miami-fort-lauderdale-west-palm-beach-fl',
-               'new-york-newark-jersey-city-ny-nj-pa',
-               'san-diego-carlsbad-ca',
-               'san-francisco-oakland-hayward-ca',
-               'seattle-tacoma-bellevue-wa',
-               'washington-arlington-alexandria-dc-va-md-wv'
-               ]
-for target_region in region_list:
+
+def count_entries(msa):
+    query = """SELECT count(review.review_text)
+                    FROM review, property 
+                    WHERE review.property_id = property.airbnb_property_id
+                    AND property.msa = %s
+                    ;"""
+    cursor.execute(query, (msa,))
+    result = cursor.fetchone()
+    return result[0]
+
+region_dict = {'austin-round-rock-tx': 'Austin-Round Rock, TX Metro Area',
+               'boston-cambridge-newton-ma-nh': 'Boston-Cambridge-Newton, MA-NH Metro Area',
+               'chicago-naperville-elgin-il-in-wi': 'Chicago-Naperville-Elgin, IL-IN-WI Metro Area',
+               'los-angeles-long-beach-anaheim-ca': 'Los Angeles-Long Beach-Anaheim, CA Metro Area',
+               'miami-fort-lauderdale-west-palm-beach-fl': 'Miami-Fort Lauderdale-West Palm Beach, FL Metro Area',
+               'new-york-newark-jersey-city-ny-nj-pa': 'New York-Newark-Jersey City, NY-NJ-PA Metro Area',
+               'san-diego-carlsbad-ca': 'San Diego-Carlsbad, CA Metro Area',
+               'san-francisco-oakland-hayward-ca':'San Francisco-Oakland-Hayward, CA Metro Area',
+               'seattle-tacoma-bellevue-wa': 'Seattle-Tacoma-Bellevue, WA Metro Area',
+               'washington-arlington-alexandria-dc-va-md-wv': 'Washington-Arlington-Alexandria, DC-VA-MD-WV Metro Area'
+               }
+for target_region, msa in region_dict.items():
     target_filename_dict = get_filenames_by_region(target_region)
     print(target_region)
     # filename = target_filename_dict['monthly_match']
-    filename = target_filename_dict['property']
-    df = pd.read_csv(os.path.join('../../data', filename), error_bad_lines=False)
-    df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')  # for property
-    df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01')  # for property
-    df['Created Date'] = df['Created Date'].fillna('1990-01-01')  # for property
-    # df['Member Since'] = df['Member Since'].fillna('1990-01-01')  # for review
-    print('finished reading file')
-    insert_into_database(df, ColumnInfo.property, verbose=False)
+    filename = target_filename_dict['review']
+    df = pd.read_csv(os.path.join('/home/rchen/Documents/github/airbnb_crime/data', filename), error_bad_lines=False)
+    existing_records = count_entries(msa)
+    raw_records = df.shape[0]
+    print('- raw:', raw_records, 'existing:', existing_records)
+    if existing_records / raw_records > 0.9:
+        continue
+    # df['Airbnb Superhost'] = df['Airbnb Superhost'].fillna('')  # for property
+    # df['Last Scraped Date'] = df['Last Scraped Date'].fillna('1990-01-01')  # for property
+    # df['Created Date'] = df['Created Date'].fillna('1990-01-01')  # for property
+    df['Member Since'] = df['Member Since'].fillna('1990-01-01')  # for review
+    print('- finished reading file')
+    insert_into_database(df, ColumnInfo.review, verbose=False)
+    # add_airbnb_property_id_in_property(df)
+    # print('- finished inserting airbnb property ids')
 
 
 # replace 1990-01-01 with null in the database

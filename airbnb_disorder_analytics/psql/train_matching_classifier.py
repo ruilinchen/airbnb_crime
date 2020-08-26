@@ -119,7 +119,7 @@ def ckdnearest(all_nodes, target_node, k=3):
 
 
 if __name__ == '__main__':
-    state_abbr = 'IL' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17, DC
+    state_abbr = 'NY' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17, DC
     uss = USStates()
     state_id = uss.abbr_to_fips[state_abbr]
     year_threshold = 2017
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     list_of_nearest_dists = []
     list_of_matched_flag = []
 
-    batch_size = 20000
+    batch_size = 10000
     for index, a_record in tqdm(enumerate(list_of_records), total=batch_size):
         target_node = np.array([[a_record[0], a_record[1]]])
         #source_nodes = all_nodes[:index] + all_nodes[index+1:]

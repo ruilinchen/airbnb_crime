@@ -236,7 +236,7 @@ if __name__ == '__main__':
     airbnb_connection = psycopg2.connect(DBInfo.airbnb_config)
     airbnb_cursor = airbnb_connection.cursor()
     ## set up CrimeDB
-    cdb = CrimeDB(state_abbr='TX')  # CA, IL, MA
+    cdb = CrimeDB(state_abbr='NY')  # CA, IL, MA
     cdb.connect_to_db(acs5={'connection': acs5_connection, 'cursor':acs5_cursor},
                       crime={'connection': crime_connection, 'cursor': crime_cursor},
                       airbnb={'connection': airbnb_connection, 'cursor': airbnb_cursor})

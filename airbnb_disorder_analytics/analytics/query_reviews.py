@@ -24,6 +24,8 @@ from airbnb_disorder_analytics.config.db_config import DBInfo
 
 class POSExtractor:
     def __init__(self, sent):
+        self.root_path = '/home/rchen/Documents/github/airbnb_crime/airbnb_disorder_analytics'
+        self.data_folder = 'analytics'
         self.sentence = sent
         self.SUBJECTS = ["nsubj", "nsubjpass", "csubj", "csubjpass", "agent", "expl"]
         self.OBJECTS = ["dobj", "dative", "attr", "oprd", 'pobj']
@@ -32,6 +34,14 @@ class POSExtractor:
         self.COMPOUNDS = ["compound"]
         self.PREPOSITIONS = ["prep"]
         self.pos_aux = ['AUX', 'VERB']
+        self.list_of_nouns_for_neighborhood = ''
+        self._get_nouns_for_neighborhood()
+
+
+    def _get_nouns_for_neighborhood(self):
+        df = pd.read_csv(os.path.join(self.root_path, self.data_folder, 'labelled_nouns_and_types_for_adjs.csv'))
+        self.list_of_nouns_for_neighborhood = df['noun'][df['type'] == 2].tolist()
+        #print('nouns:', self.list_of_nouns_for_neighborhood)
 
     @staticmethod
     def get_nouns_from_conjunctions(nouns):
@@ -67,31 +77,33 @@ class POSExtractor:
         return more_adjs
 
     def get_all_adjs(self, word):
-        list_of_adjs = [right for right in word.rights if right.dep_ in self.ADJECTIVES]
+        list_of_adjs = [right for right in word.rights if right.dep_ in self.ADJECTIVES or right.pos_ == 'ADJ']
+        list_of_adjs += [left for left in word.lefts if left.dep_ in self.ADJECTIVES or left.pos_ == 'ADJ']
         if len(list_of_adjs):
             list_of_adjs.extend(self.get_adjs_from_conjunctions(list_of_adjs))
         return list_of_adjs
 
     def get_all_adjs_for_keyword(self):
+        #print('get_all_adjs_for_keyword')
         noun_compound = []
-        visited_nouns = set()
         for token in self.sentence:
-            if token.pos_ == 'NOUN' and token not in visited_nouns:
+            if token.pos_ == 'NOUN':
                 new_compound = self.get_noun_compound(token)
-                visited_nouns.update(new_compound)
                 noun_compound.append(new_compound)
         adjs_for_keywords = []
+        #print('noun_compound:', noun_compound)
         for nouns in noun_compound:
             has_keyword = False
             for noun in nouns:
-                if noun.text.lower() in qr.list_of_nouns_for_neighborhood:
+                if noun.text.lower() in self.list_of_nouns_for_neighborhood:
                     has_keyword = True
             if has_keyword:
                 for noun in nouns:
                     list_of_adjs = self.get_all_adjs(noun)
                     adjs_for_keywords += ['!'+adj.text.lower() if self.is_negated(adj)
                                           else adj.text.lower() for adj in list_of_adjs]
-        return adjs_for_keywords
+        #print('adjs_for_keywords:', adjs_for_keywords)
+        return list(set(adjs_for_keywords))
 
     def get_all_objs_with_adjectives(self, v):
         # rights is a generator
@@ -260,7 +272,10 @@ class POSExtractor:
 
     @staticmethod
     def is_negated(token):
-        negations = {"no", "not", "n't", "never", "none"}
+        negations = {"no", "not", "n't", "never", "none", "don t", "dont", "doesnt",
+                     "doesn t", "didn t", "didnt", "isn t", "isnt", "wasnt", "wasn t",
+                     "werent", "weren t", "arent", "aren t", "hasnt", "hasn t", "havent", "haven t",
+                     "hadnt", "hadn t"}
         for dep in list(token.lefts) + list(token.rights):
             if dep.lower_ in negations:
                 return True
@@ -339,7 +354,7 @@ class POSExtractor:
             subs, verb_negated = self.get_all_subs(v)
             contains_keywords = False
             for sub in subs:
-                if sub.text.lower() in qr.list_of_nouns_for_neighborhood:
+                if sub.text.lower() in self.list_of_nouns_for_neighborhood:
                     contains_keywords = True
             # hopefully there are subs, if not, don't examine this verb any longer
             if len(subs) > 0 and contains_keywords:
@@ -394,7 +409,7 @@ class QueryReview:
     def _get_nouns_for_neighborhood(self):
         df = pd.read_csv(os.path.join(self.root_path, self.data_folder, 'labelled_nouns_and_types_for_adjs.csv'))
         self.list_of_nouns_for_neighborhood = df['noun'][df['type'] == 2].tolist()
-        print('nouns:', self.list_of_nouns_for_neighborhood)
+        #print('nouns:', self.list_of_nouns_for_neighborhood)
 
     def count_occurences_of_keyword(self, key_words):
         query = """SELECT count(*)
@@ -640,11 +655,16 @@ if __name__ == '__main__':
     print(safety_words)
     print('safety words count:', len(safety_words))
 
-    query = """SELECT count (distinct property_id)
-                FROM review
+    query = """SELECT count(review.reviewer_id) as review_count, property.airbnb_property_id
+                FROM review, property
                 WHERE review.review_text LIKE ANY (values {})
+                AND review.property_id = property.airbnb_property_id
+                AND property.state = 'New York'
+                GROUP BY property.airbnb_property_id
+                ORDER BY review_count DESC
+                LIMIT 100
                 ;
-                """.format(qr.format_keywords_for_search(list(safety_words)))
+                """.format(qr.format_keywords_for_search(list(qr.list_of_nouns_for_neighborhood)))
     qr.airbnb_cursor.execute(query)
     results = qr.airbnb_cursor.fetchall()
     print(results)

@@ -177,8 +177,8 @@ def insert_by_pandas(city, state_abbr, crime_df, crime_columns=None, batch_size=
 
 
 if __name__ == '__main__':
-    city = 'DC'
-    state_abbr = 'DC' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
+    city = 'nyc'
+    state_abbr = 'NY' # MA: 25; TX: 48, NY: 36, CA: 06, IL: 17
     uss = USStates()
     state_id = uss.abbr_to_fips[state_abbr]
     acs5_connection = psycopg2.connect(DBInfo.acs5_config)
